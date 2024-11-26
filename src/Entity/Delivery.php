@@ -19,6 +19,9 @@ class Delivery
     #[ORM\Column(length: 255)]
     private ?string $note = null;
 
+    #[ORM\ManyToOne(inversedBy: 'deliveries')]
+    private ?Order $ord = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +47,18 @@ class Delivery
     public function setNote(string $note): static
     {
         $this->note = $note;
+
+        return $this;
+    }
+
+    public function getOrd(): ?Order
+    {
+        return $this->ord;
+    }
+
+    public function setOrd(?Order $ord): static
+    {
+        $this->ord = $ord;
 
         return $this;
     }
