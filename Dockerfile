@@ -8,6 +8,7 @@ RUN apt install -y libzip-dev git wget --no-install-recommends
 RUN docker-php-ext-install pdo mysqli pdo_mysql zip;
 
 
+
 # Install OPCache
 RUN docker-php-ext-install opcache
 
@@ -26,6 +27,8 @@ RUN mv composer.phar /usr/bin/composer
 RUN chmod +x /usr/bin/composer
  
 COPY apache.conf /etc/apache2/sites-enabled/000-default.conf
+
+
  
 WORKDIR /var/www
 

@@ -50,6 +50,10 @@ class Product
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'product')]
     private Collection $image;
 
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Rubric $rubric = null;
+
     public function __construct()
     {
         $this->image = new ArrayCollection();
@@ -194,6 +198,18 @@ class Product
                 $image->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRubric(): ?Rubric
+    {
+        return $this->rubric;
+    }
+
+    public function setRubric(?Rubric $rubric): static
+    {
+        $this->rubric = $rubric;
 
         return $this;
     }

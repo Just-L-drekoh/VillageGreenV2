@@ -37,9 +37,16 @@ class Rubric
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     private Collection $rubrics;
 
+    /**
+     * @var Collection<int, Product>
+     */
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'rubric')]
+    private Collection $products;
+
     public function __construct()
     {
         $this->rubrics = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,6 +138,36 @@ class Rubric
             // set the owning side to null (unless already changed)
             if ($rubric->getParent() === $this) {
                 $rubric->setParent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setRubric($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getRubric() === $this) {
+                $product->setRubric(null);
             }
         }
 
