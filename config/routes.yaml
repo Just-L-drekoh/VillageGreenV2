@@ -1,5 +1,45 @@
 controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+  resource:
+    path: ../src/Controller/
+    namespace: App\Controller
+  type: attribute
+
+# Toutes les Routes
+
+# Authentification
+app_register:
+  path: /register
+  controller: App\Controller\RegistrationController::register
+
+#verifier email
+app_verify:
+  path: /verif/{token}
+  controller: App\Controller\RegistrationController::verifUser
+
+#resend email
+app_resend:
+  path: /resend
+  controller: App\Controller\RegistrationController::resendVerification
+# Connexion
+app_login:
+  path: /login
+  controller: App\Controller\SecurityController::login
+
+# Deconnexion
+app_logout:
+  path: /logout
+  controller: App\Controller\SecurityController::logout
+
+# Accueil
+app_index:
+  path: /
+  controller: App\Controller\MainController::index
+  defaults:
+    role: ROLE_USER
+
+# Profil
+app_profile:
+  path: /profile
+  controller: App\Controller\ProfilController::profile
+  defaults:
+    role: ROLE_USER
