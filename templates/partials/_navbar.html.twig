@@ -1,0 +1,104 @@
+<nav
+	class="bg-navbar p-10 rounded-3xl m-2 shadow-lg flex items-center justify-between">
+	<!-- Logo -->
+	<a href="#" class="text-4xl font-serif font-bold tracking-wide text-black">
+		Village Green
+	</a>
+
+	<!-- Desktop Menu -->
+	<div class="hidden lg:flex space-x-6">
+		<ul class="flex space-x-6">
+			<li>
+				<a href="#" class="text-2xl text-black hover:text-blue-500 transition">
+					Nos-Rubriques
+				</a>
+			</li>
+			<li>
+				<a href="#" class="text-2xl text-black hover:text-blue-500 transition">
+					Tous-nos-Instruments
+				</a>
+			</li>
+			<li>
+				<a href="#" class="text-2xl text-black hover:text-blue-500 transition">
+					Nous-Contactez
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<!-- Search Bar -->
+	<div class="hidden lg:flex items-center space-x-4 shadow-xl">
+		<input type="text" placeholder="Rechercher..." class="px-4 py-2 border rounded-xl text-black focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+	</div>
+
+	<!-- Profile & Actions -->
+	{# {{ app.user ? path('app_profil') : path('app_login') }} #}
+	<div class="hidden lg:flex space-x-3">
+		<a href="#" class="text-2xl text-black hover:text-blue-500 transition">
+			<svg class="h-8 w-8" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+			</svg>
+		</a>
+		<a href="#" class="text-2xl text-black hover:text-blue-500 transition">
+			<svg class="h-8 w-8" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+			</svg>
+		</a>
+		{% if app.user %}
+			<p class="text-xl ">{{ app.user.getUserLastname() }}</p>
+			<p class="text-xl ">{{ app.user.getUserFirstname() }}</p>
+
+			<a href="#" class="text-2xl text-black hover:text-blue-500 transition">
+				<svg class="h-8 w-8" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M21 12L13 12" stroke="#323232" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					<path d="M18 15L20.913 12.087V12.087C20.961 12.039 20.961 11.961 20.913 11.913V11.913L18 9" stroke="#323232" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+					<path d="M16 5V4.5V4.5C16 3.67157 15.3284 3 14.5 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H14.5C15.3284 21 16 20.3284 16 19.5V19.5V19" stroke="#323232" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+			</a>
+		{% endif %}
+	</div>
+
+	<!-- Mobile Menu Button -->
+	<button class="lg:hidden" id="hamburger-menu">
+		<svg class="h-8 w-8 text-black" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+		</svg>
+	</button>
+</nav>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="hidden lg:hidden p-4 m-2 bg-navbar rounded-xl">
+	<ul class="space-y-4 flex flex-col items-center justify-center">
+		<li>
+			<a href="#" class="text-2xl text-black hover:text-blue-500 transition block">
+				Nos-Rubriques
+			</a>
+		</li>
+		<li>
+			<a href="#" class="text-2xl text-black hover:text-blue-500 transition block">
+				Tous-nos-Produits
+			</a>
+		</li>
+		<li>
+			<a href="#" class="text-2xl text-black hover:text-blue-500 transition block">
+				Nous-Contactez
+			</a>
+		</li>
+		<li>
+			<a href="#" class="text-2xl text-black hover:text-blue-500 transition block">
+				Profil
+			</a>
+		</li>
+		<li>
+			<a href="#" class="text-2xl text-black hover:text-blue-500 transition block">
+				Panier
+			</a>
+		</li>
+		{% if app.user %}
+			<li>
+				<a href="#" class="text-2xl text-black hover:text-blue-500 transition block">
+					Déconnexion
+				</a>
+			</li>
+		{% endif %}
+	</ul>
+</div>
