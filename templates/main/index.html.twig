@@ -1,6 +1,14 @@
-{% extends 'base.html.twig' %} {% block title %}Accueil | Village Green{%
-endblock %} {% block body %}
-<h1 class="text-center underline text-4xl font-bold">
-  Ceci est la page d'accueil
-</h1>
+{% extends 'base.html.twig' %}
+{% block title %}
+	Village Green | Accueil
+{% endblock %}
+
+
+{% block body %}
+	<div class=" h-64 m-2 rounded-xl shadow-xl">
+		<img class="hidden lg:flex w-full h-full object-cover rounded-xl" src="{{ asset('images/hands-1851426_1920.webp') }}" alt="Hands image"/>
+		<div class="mt-4 flex justify-center items-center text-white">
+			<h1 class="text-4xl mt-4 font-serif text-black">Bienvenue sur Village Green</h1>
+		</div>
+	</div>
 {% endblock %}

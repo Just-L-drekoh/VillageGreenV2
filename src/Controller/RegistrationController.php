@@ -136,6 +136,6 @@ public function resendVerification(
     );
 
     $this->addFlash('success', "Un nouvel e-mail de vérification a été envoyé.");
-    return $this->redirectToRoute('app_profil');
+    return $this->redirectToRoute('app_profile');
 }
 }

@@ -23,13 +23,15 @@
 		<div class="flex items-center">
 			{{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'mr-2'}}) }}
 			{{ form_label(registrationForm.agreeTerms, 'J\'accepte les conditions') }}
-            </div>
+		</div>
 
-            <button type="submit" class="w-full bg-indigo-600  py-2 rounded shadow-md hover:bg-indigo-700">
-                Créer un compte
-            </button>
-        {{ form_end(registrationForm) }}
-    </div>
-    <p>Vous avez deja un compte ? <a href="{{ path('app_login') }}" class="text-indigo-600 hover:underline">Se connecter</a></p>
+		<button type="submit" class="w-full bg-indigo-600 py-2 rounded shadow-md hover:bg-indigo-700">
+			Créer un compte
+		</button>
+		{{ form_end(registrationForm) }}
+	</div>
+	<p>Vous avez déjà un compte ? <a href="{{ path('app_login') }}" class="text-indigo-600 hover:underline">Se connecter</a></p>
 </div>
+
+
 {% endblock %}

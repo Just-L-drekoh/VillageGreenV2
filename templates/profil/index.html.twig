@@ -1,99 +1,97 @@
-{% extends 'base.html.twig' %} {% block title %}Votre Profil {% endblock %} {%
-block body %} {% if "ROLE_ADMIN" in app.user.roles %}
-<h1>test</h1>
-{% endif %}
-<div class="container mx-auto mt-12 p-6 bg-gray-100 shadow-lg rounded-xl">
-  <!-- Titre principal -->
-  <h1 class="text-4xl font-bold text-gray-800 text-center mb-6">
-    Heureux de vous revoir,
-    <span class="text-blue-600">{{ user.firstName }}</span
-    >!
-  </h1>
+{% extends 'base.html.twig' %}
+{% block title %}Votre Profil
+{% endblock %}
+{%
+block body %}
+	<div class="container mx-auto mt-12 p-6 bg-gray-100 shadow-lg rounded-xl">
+		<h1 class="text-4xl font-bold text-gray-800 text-center mb-6">
+			Heureux de vous revoir,
+			<span class="text-blue-600">{{ user.firstName }}</span>!
+		</h1>
 
-  <!-- Référence utilisateur -->
-  <p class="text-lg font-medium text-gray-600 text-center mb-8">
-    Votre Référence :
-    <span class="font-bold text-gray-800">{{ user.ref }}</span>
-  </p>
+		<p class="text-lg font-medium text-gray-600 text-center mb-8">
+			Votre Référence :
+			<span class="font-bold text-gray-800">{{ user.ref }}</span>
+		</p>
 
-  {% if app.user.roles[0] == 'ROLE_ADMIN' %}
-  <!-- Accès au Tableau de bord (Administrateur) -->
-  <div class="bg-white p-4 rounded-lg shadow-md mb-8">
-    <p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-      Tableau de bord
-    </p>
-    <a href="#" class="text-lg font-medium text-blue-600 hover:underline">
-      Cliquez ici pour accéder au tableau de bord
-    </a>
-  </div>
-  {% endif %}
+		{% if is_granted('ROLE_ADMIN') %}
+			<div class="bg-white p-4 rounded-lg shadow-md mb-8">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
+					Tableau de bord
+				</p>
+				<a href="#" class="text-lg font-medium text-blue-600 hover:underline">
+					Cliquez ici pour accéder au tableau de bord
+				</a>
+			</div>
+		{% endif %}
 
-  <!-- Détails utilisateur -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    <!-- Prénom -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-      <p class="text-sm font-semibold text-gray-500 uppercase mb-2">Prénom</p>
-      <p class="text-xl text-gray-800">{{ user.firstName }}</p>
-    </div>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+			<div class="bg-white p-6 rounded-lg shadow-md">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">Prénom</p>
+				<p class="text-xl text-gray-800">{{ user.firstName }}</p>
+			</div>
 
-    <!-- Nom -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-      <p class="text-sm font-semibold text-gray-500 uppercase mb-2">Nom</p>
-      <p class="text-xl text-gray-800">{{ user.lastName }}</p>
-    </div>
+			<div class="bg-white p-6 rounded-lg shadow-md">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">Nom</p>
+				<p class="text-xl text-gray-800">{{ user.lastName }}</p>
+			</div>
 
-    <!-- Email -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-      <p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-        Adresse Email
-      </p>
-      <p class="text-xl text-gray-800">{{ user.email }}</p>
-    </div>
+			<div class="bg-white p-6 rounded-lg shadow-md">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
+					Adresse Email
+				</p>
+				<p class="text-xl text-gray-800">{{ user.email }}</p>
+			</div>
 
-    <!-- Téléphone -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-      <p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-        Numéro de Téléphone
-      </p>
-      <p class="text-xl text-gray-800">{{ user.Phone }}</p>
-    </div>
-  </div>
+			<div class="bg-white p-6 rounded-lg shadow-md">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
+					Numéro de Téléphone
+				</p>
+				<p class="text-xl text-gray-800">{{ user.Phone }}</p>
+			</div>
+		</div>
 
-  {% if not app.user.verified %}
-  <!-- Alerte d'activation -->
-  <div
-    class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg"
-  >
-    <p class="font-medium text-center">
-      Votre compte n'est pas encore activé. Cliquez sur le bouton ci-dessous
-      pour recevoir un nouvel e-mail d'activation.
-    </p>
-  </div>
+		{% if not app.user.verified %}
+			<div class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
+				<p class="font-medium text-center">
+					Votre compte n'est pas encore activé. Cliquez sur le bouton ci-dessous
+																																																																																																																																																																																																													      pour recevoir un nouvel e-mail d'activation.
+				</p>
+			</div>
 
-  <!-- Bouton de renvoi -->
-  <div class="mt-6 text-center">
-    <a
-      href="{{ path('app_resend') }}"
-      class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
-    >
-      Renvoyer l'e-mail de vérification
-    </a>
-  </div>
-  {% endif %}
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    {% for address in user.address %}
-    <div class="bg-white p-6 rounded-lg shadow-md">
-      <p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-        Adresse {{ loop.index }}
-      </p>
-      <p class="text-xl text-gray-800">
-        {{ address.adrAddress }}
-        {{ address.adrCp }}
-        {{ address.adrCity }}
-      </p>
-      <p class="text-sm text-gray-600">{{ address.adrType }}</p>
-    </div>
-    {% endfor %}
-  </div>
-</div>
+			<div class="mt-6 text-center">
+				<a href="{{ path('app_resend') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+					Renvoyer l'e-mail de vérification
+				</a>
+			</div>
+		{% endif %}
+
+		{# TODO : faire la conditions pour ajouter une adresse #}
+		{# {% if address.type != 'Livraison' and address.type != 'Facturation' %}
+															<a href="{{ path('app_addAddress') }}" class="text-blue-600 hover:underline">ajouter une adresse</a>
+														{% endif %} #}
+		<a href="{{ path('app_addAddress') }}" class="text-blue-600 hover:underline">ajouter une adresse</a>
+
+
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+			{% for address in user.address %}
+				<div class="bg-white p-6 rounded-lg shadow-md">
+					<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
+						Adresse
+						{{ loop.index }}
+					</p>
+					<p class="text-xl text-gray-800">
+						{{ address.Address }}
+						{{ address.Cp }}
+						{{ address.City }}
+					</p>
+					<p class="text-sm text-gray-600">{{ address.Type }}</p>
+
+					<a href="{{ path('app_updateAddress', {'id': address.id}) }}" class="text-blue-600 hover:underline px-4 py-2 rounded-md">Modifier</a>
+					<a href="{{ path('app_deleteAddress', {'id': address.id}) }}" class="text-red-600 hover:underline px-4 py-2 rounded-md">Supprimer</a>
+
+				</div>
+			{% endfor %}
+		</div>
+	</div>
 {% endblock %}
