@@ -37,6 +37,11 @@ app_index:
   defaults:
     role: ROLE_USER
 
+# Toutes les rubriques
+app_rubrics:
+  path: /rubrics
+  controller: App\Controller\MainController::rubrics
+
 # Profil
 app_profile:
   path: /profile

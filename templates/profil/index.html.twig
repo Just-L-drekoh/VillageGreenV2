@@ -55,7 +55,7 @@ block body %}
 			<div class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
 				<p class="font-medium text-center">
 					Votre compte n'est pas encore activé. Cliquez sur le bouton ci-dessous
-																																																																																																																																																																																																													      pour recevoir un nouvel e-mail d'activation.
+																																																																																																																																																																																																																		      pour recevoir un nouvel e-mail d'activation.
 				</p>
 			</div>
 
@@ -68,8 +68,8 @@ block body %}
 
 		{# TODO : faire la conditions pour ajouter une adresse #}
 		{# {% if address.type != 'Livraison' and address.type != 'Facturation' %}
-															<a href="{{ path('app_addAddress') }}" class="text-blue-600 hover:underline">ajouter une adresse</a>
-														{% endif %} #}
+																	<a href="{{ path('app_addAddress') }}" class="text-blue-600 hover:underline">ajouter une adresse</a>
+																{% endif %} #}
 		<a href="{{ path('app_addAddress') }}" class="text-blue-600 hover:underline">ajouter une adresse</a>
 
 
@@ -81,9 +81,11 @@ block body %}
 						{{ loop.index }}
 					</p>
 					<p class="text-xl text-gray-800">
+						<span class="text-gray-500">{{ address.complement }}</span>
 						{{ address.Address }}
 						{{ address.Cp }}
 						{{ address.City }}
+
 					</p>
 					<p class="text-sm text-gray-600">{{ address.Type }}</p>
 
