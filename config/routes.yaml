@@ -42,6 +42,32 @@ app_rubrics:
   path: /rubrics
   controller: App\Controller\MainController::rubrics
 
+# Tout les produits d'une rubrique
+app_productsByRubric:
+  path: /products/{slug}
+  controller: App\Controller\MainController::productsByRubric
+
+#Tout les Produits
+app_products:
+  path: /products
+  controller: App\Controller\MainController::products
+  defaults:
+    role: ROLE_USER
+
+# Details d'un produit
+app_productDetails:
+  path: /product/{slug}
+  controller: App\Controller\MainController::productDetails
+  defaults:
+    role: ROLE_USER
+
+# Panier
+app_cart:
+  path: /cart
+  controller: App\Controller\CartController::viewCart
+  defaults:
+    role: ROLE_USER
+
 # Profil
 app_profile:
   path: /profile

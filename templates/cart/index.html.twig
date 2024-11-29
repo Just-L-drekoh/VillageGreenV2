@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Votre Panier |
+	{{ app.user.firstName }}
+{% endblock %}
+
+{% block body %}
+	<div class="container mx-auto p-6 bg-gray-100 shadow-lg rounded-xl mt-12">
+		<h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">
+			Votre Panier
+			<span class="text-blue-600">{{ app.user.firstName }}
+				{{ app.user.lastName }}</span>
+		</h1>
+
+		<div class="bg-white p-6 rounded-lg shadow-md">
+			{# {% if cartItems is not empty %}
+																			<div class="overflow-x-auto">
+																				<table class="min-w-full table-auto">
+																					<thead>
+																						<tr class="bg-gray-200 text-left">
+																							<th class="py-2 px-4">Produit</th>
+																							<th class="py-2 px-4">Quantité</th>
+																							<th class="py-2 px-4">Prix Unitaire</th>
+																							<th class="py-2 px-4">Total</th>
+																							<th class="py-2 px-4"></th>
+																						</tr>
+																					</thead>
+																					<tbody>
+																						{% for item in cartItems %}
+																							<tr class="border-b hover:bg-gray-50">
+																								<td class="py-2 px-4">{{ item.product.name }}</td>
+																								<td class="py-2 px-4">{{ item.quantity }}</td>
+																								<td class="py-2 px-4">{{ item.product.price }}
+																									€</td>
+																								<td class="py-2 px-4">{{ item.product.price * item.quantity }}
+																									€</td>
+																								<td class="py-2 px-4 text-right">
+																									<a href="{{ path('remove_from_cart', {'productId': item.product.id}) }}" class="text-red-600 hover:text-red-800">
+																										Supprimer
+																									</a>
+																								</td>
+																							</tr>
+																						{% endfor %}
+																					</tbody>
+																				</table>
+																			</div> #}
+
+			{# <!-- Total du panier -->
+													<div class="mt-6 text-right"> <p class="text-xl font-semibold text-gray-800">Total :
+														{{ totalAmount }}
+														€</p>
+												</div> #}
+
+			<!-- Boutons -->
+				<div class="mt-8 flex justify-between"> <a href="{{path('app_products')}}" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition duration-300">
+					Continuer vos achats
+				</a>
+				<a href="#" class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+					Passer à la caisse
+				</a>
+			</div>
+
+			<p class="text-center text-lg text-gray-600">Votre panier est vide.</p>
+
+		</div>
+	</div>
+{% endblock %}
