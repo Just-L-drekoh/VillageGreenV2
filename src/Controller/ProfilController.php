@@ -7,37 +7,64 @@ use App\Form\AddressFormType;
 use App\Repository\AddressRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ProfilController extends AbstractController
 {
-   
+    private $validator;
+
+    public function __construct(ValidatorInterface $validator)
+    {
+        $this->validator = $validator;
+    }
+
     public function profile(AddressRepository $addressRepository): Response
     {
         $user = $this->getUser();
-        $address = $addressRepository->findBy(['user' => $user]);
-        
+
+        // Vérification si l'utilisateur est connecté
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
+        try {
+
+            if (!$this->validator->validate($user)) {
+                throw new \RuntimeException('Utilisateur non valide');
+            }
+            $address = $addressRepository->findBy(['user' => $user]);
+
+            if (!$this->validator->validate($address)) {
+                throw new \RuntimeException('Adresse non valide');
+            }
+        } catch (\RuntimeException $e) {
+            $this->addFlash('error', $e->getMessage());
+            return $this->redirectToRoute('app_index');
+        }
+
+        // Affichage du profil en cas de succès
         return $this->render('profil/index.html.twig', [
             'controller_name' => 'ProfilController',
             'user' => $user,
-            'address'=> $address
+            'address' => $address,
         ]);
     }
+
 
     public function addAddress(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
-    
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-    
+
         $existingShipping = $entityManager->getRepository(Address::class)->findOneBy([
             'type' => 'Livraison',
             'user' => $user
@@ -46,12 +73,12 @@ class ProfilController extends AbstractController
             'type' => 'Facturation',
             'user' => $user
         ]);
-    
+
         if ($existingShipping && $existingBilling) {
             $this->addFlash('warning', 'Vous avez déjà une adresse de livraison et une adresse de facturation.');
             return $this->redirectToRoute('app_profile');
         }
-    
+
         $address = new Address();
         $address->setUser($user);
         $address->setDefault(true);
@@ -62,64 +89,64 @@ class ProfilController extends AbstractController
         if (!$existingBilling) {
             $availableTypes['Facturation'] = 'Facturation';
         }
-    
+
         $form = $this->createForm(AddressFormType::class, $address, [
             'available_types' => $availableTypes,
             'csrf_protection' => true,
-        ]);        
+        ]);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($address);
             $entityManager->flush();
-    
+
             return $this->redirectToRoute('app_profile');
         }
-    
+
         return $this->render('profil/addAddress.html.twig', [
             'form' => $form->createView(),
         ]);
     }
-    
+
     public function updateAddress(Request $request, Address $address, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         $address = $entityManager->getRepository(Address::class)->find($address->getId());
-   
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
         $addresstype = $address->getType();
-       
+
         if ($address->getUser() !== $user) {
             return $this->redirectToRoute('app_profile');
         }
 
         $availableTypes = [];
-        
-        $availableTypes[$addresstype] = $addresstype;
-     
-    $form = $this->createForm(AddressFormType::class, $address, [
-        
-        'available_types' => $availableTypes,
 
-        'csrf_protection' => true,
-    ]);  
-    $form->handleRequest($request);
-            
+        $availableTypes[$addresstype] = $addresstype;
+
+        $form = $this->createForm(AddressFormType::class, $address, [
+
+            'available_types' => $availableTypes,
+
+            'csrf_protection' => true,
+        ]);
+        $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
-           
+
             $entityManager->persist($address);
             $entityManager->flush();
-    
+
             return $this->redirectToRoute('app_profile');
         }
-    
+
         return $this->render('profil/uptadeAddress.html.twig', [
             'form' => $form->createView(),
         ]);
     }
-    
+
 
     public function deleteAddress(Address $address, EntityManagerInterface $entityManager): Response
     {

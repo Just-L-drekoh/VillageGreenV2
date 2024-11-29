@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur
+{% endblock %}
+
+{% block body %}
+	<div class="flex items-center justify-center min-h-screen bg-gray-100">
+		<div class="bg-white shadow-lg rounded-lg p-6 text-center max-w-md w-full">
+			<h1 class="text-4xl font-bold text-red-600">Une erreur est survenue</h1>
+			<p class="mt-4 text-gray-700">
+				{{ message is defined ? message : "Nous avons rencontré un problème lors de votre requête." }}
+			</p>
+			<div class="mt-6 space-y-3">
+				<a href="{{ path('app_index') }}" class="block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
+					Retour à l'accueil
+				</a>
+				<a href="{{ path('app_profile') }}" class="block bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition">
+					Revenir à votre profil
+				</a>
+			</div>
+		</div>
+	</div>
+{% endblock %}
