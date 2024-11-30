@@ -33,7 +33,7 @@ app_logout:
 
 #Changer de mot de passe
 app_changePassword:
-  path: /changePassword
+  path: /changePassword/{id}
   controller: App\Controller\SecurityController::changePassword
   defaults:
     role: ROLE_USER

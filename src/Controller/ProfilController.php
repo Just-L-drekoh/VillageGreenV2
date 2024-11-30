@@ -38,11 +38,6 @@ class ProfilController extends AbstractController
             if (!$this->validator->validate($user)) {
                 throw new \RuntimeException('Utilisateur non valide');
             }
-            $address = $addressRepository->findBy(['user' => $user]);
-
-            if (!$this->validator->validate($address)) {
-                throw new \RuntimeException('Adresse non valide');
-            }
         } catch (\RuntimeException $e) {
             $this->addFlash('error', $e->getMessage());
             return $this->redirectToRoute('app_index');
@@ -51,8 +46,7 @@ class ProfilController extends AbstractController
         // Affichage du profil en cas de succès
         return $this->render('profil/index.html.twig', [
             'controller_name' => 'ProfilController',
-            'user' => $user,
-            'address' => $address,
+            'user' => $user
         ]);
     }
 

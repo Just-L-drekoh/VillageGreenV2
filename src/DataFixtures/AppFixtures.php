@@ -179,6 +179,20 @@ class AppFixtures extends Fixture
             }
         }
 
+        # Creation d'une taxe dans la BDD
+        try {
+            $tax = new \App\Entity\Tax();
+            $tax->setRate('18.60');
+            $manager->persist($tax);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Erreur lors de la creation d\'une taxe', 0, $e);
+        }
+
+        try {
+            $manager->flush();
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Erreur lors de la sauvegarde de la taxe', 0, $e);
+        }
 
         # Creation de Produit dans la BDD
         for ($i = 0; $i < 10; $i++) {
@@ -190,8 +204,10 @@ class AppFixtures extends Fixture
                 $product->setPrice(mt_rand(1, 100));
                 $product->setRef("Inst:" . mt_rand(10000, 99999));
                 $product->setContent($faker->paragraph);
+                $product->setWeight($faker->randomFloat(2, 0, 100));
                 $product->setSupplier($faker->randomElement($manager->getRepository(\App\Entity\SupplierDetails::class)->findAll()));
                 $product->setRubric($faker->randomElement($manager->getRepository(\App\Entity\Rubric::class)->findAll()));
+                $product->setTax($faker->randomElement($manager->getRepository(\App\Entity\Tax::class)->findAll()));
                 $product->setCreatedAt(new DateTimeImmutable());
                 $product->setUpdatedAt(new DateTimeImmutable());
                 $manager->persist($product);

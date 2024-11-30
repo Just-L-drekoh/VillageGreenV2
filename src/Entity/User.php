@@ -233,7 +233,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastConnect(\DateTimeImmutable $lastConnect): static
     {
         $this->lastConnect = $lastConnect;
-                    
+
         return $this;
     }
 

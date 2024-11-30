@@ -7,7 +7,7 @@
 	<div class="container mx-auto mt-12 p-6 bg-gray-100 shadow-lg rounded-xl">
 		<h1 class="text-4xl font-bold text-gray-800 text-center mb-6">Rubriques</h1>
 
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 			{% for rubric in rubrics %}
 				<div class="bg-white p-6 rounded-lg shadow-md">
 					<div class="mb-4">
@@ -33,7 +33,10 @@
 										{% endif %}
 										<p class="text-gray-500 mt-2 text-sm">{{ subrubric.content }}</p>
 									</li>
-									<a href="{{ path('app_productsByRubric', {'slug': subrubric.slug}) }}" class="text-blue-600 hover:underline">Voir les instruments</a>
+
+									<a href="{{ path('app_productsByRubric', {'slug': subrubric.slug}) }}" class=" px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+										Voir les instruments
+									</a>
 								{% endfor %}
 							</ul>
 						</div>

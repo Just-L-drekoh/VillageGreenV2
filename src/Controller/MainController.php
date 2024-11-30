@@ -11,12 +11,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class MainController extends AbstractController
 {
-
+    #Cette fonction affichera la page d'accueil de l'application Village Green
+    #il affiche les rubriques et les produits les plus populaires
     public function index(): Response
     {
         return $this->render('main/index.html.twig', []);
     }
 
+    #Cette fonction affichera toutes les rubriques de l'application Village Green
+    #il affiche les rubriques et les sous rubriques correspondantes a cette meme rubrique
     public function rubrics(EntityManagerInterface $entityManager): Response
     {
 
@@ -27,9 +30,36 @@ class MainController extends AbstractController
             return $this->redirectToRoute('app_index');
         }
 
-        return $this->render('main/rubrics.html.twig', ['rubrics' => $viewRubrics]);
+        return $this->render('main/rubric/rubrics.html.twig', ['rubrics' => $viewRubrics]);
     }
 
+    #Cette fonction affichera tous les produits par rubrique/sousRubrique
+    #il affiche les produits par rubrique/sousRubrique par rapport au slug de la rubrique
+    public function productsByRubric(EntityManagerInterface $entityManager, string $slug): Response
+    {
+        try {
+            #Recherche de la rubrique
+            $rubric = $entityManager->getRepository(Rubric::class)->findOneBy(['slug' => $slug]);
+
+            if (!$rubric) {
+                throw new \Exception('Rubrique introuvable');
+            }
+
+            #Recherche des produits liée a la sous rubrique
+            $viewProductByRubric = $entityManager->getRepository(Product::class)->findBy(['rubric' => $rubric]);
+
+            return $this->render('main/rubric/productsByRubric.html.twig', [
+                'rubric' => $rubric,
+                'products' => $viewProductByRubric
+            ]);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Impossible de charger les instruments par rubrique');
+            return $this->redirectToRoute('app_index');
+        }
+    }
+
+    #Cette fonction affichera tous les produits
+    #il affiche tous les produits
     public function products(EntityManagerInterface $entityManager): Response
     {
 
@@ -40,9 +70,12 @@ class MainController extends AbstractController
             return $this->redirectToRoute('app_index');
         }
 
-        return $this->render('main/products.html.twig', ['products' => $viewProducts]);
+        return $this->render('main/product/products.html.twig', ['products' => $viewProducts]);
     }
 
+
+    #Cette fonction affichera le detail du produit
+    #il affiche le detail du produit par rapport au slug
     public function productDetails(EntityManagerInterface $entityManager, string $slug): Response
     {
 
@@ -53,29 +86,6 @@ class MainController extends AbstractController
             return $this->redirectToRoute('app_index');
         }
 
-        return $this->render('main/productDetails.html.twig', ['product' => $viewProductDetails]);
-    }
-
-    public function productsByRubric(EntityManagerInterface $entityManager, string $slug): Response
-    {
-        try {
-            // Trouver la rubrique correspondante au slug
-            $rubric = $entityManager->getRepository(Rubric::class)->findOneBy(['slug' => $slug]);
-
-            if (!$rubric) {
-                throw new \Exception('Rubrique introuvable');
-            }
-
-            // Récupérer les produits liés à cette rubrique
-            $viewProductByRubric = $entityManager->getRepository(Product::class)->findBy(['rubric' => $rubric]);
-
-            return $this->render('main/productsByRubric.html.twig', [
-                'rubric' => $rubric,
-                'products' => $viewProductByRubric
-            ]);
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Impossible de charger les instruments par rubrique');
-            return $this->redirectToRoute('app_index');
-        }
+        return $this->render('main/product/productDetails.html.twig', ['product' => $viewProductDetails]);
     }
 }

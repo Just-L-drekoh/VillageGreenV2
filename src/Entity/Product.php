@@ -56,6 +56,13 @@ class Product
     #[ORM\JoinColumn(nullable: false)]
     private ?Rubric $rubric = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    private ?string $weight = null;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Tax $tax = null;
+
     public function __construct()
     {
         $this->image = new ArrayCollection();
@@ -212,6 +219,30 @@ class Product
     public function setRubric(?Rubric $rubric): static
     {
         $this->rubric = $rubric;
+
+        return $this;
+    }
+
+    public function getWeight(): ?string
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(string $weight): static
+    {
+        $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function getTax(): ?Tax
+    {
+        return $this->tax;
+    }
+
+    public function setTax(?Tax $tax): static
+    {
+        $this->tax = $tax;
 
         return $this;
     }
