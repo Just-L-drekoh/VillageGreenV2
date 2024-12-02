@@ -50,10 +50,6 @@ class ChangePasswordType extends AbstractType
                     ]),
                     // This ensures the two fields match; you'll validate it in the controller.
                 ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Changer le mot de passe',
-                'attr' => ['class' => 'btn btn-primary'],
             ]);
     }
 }

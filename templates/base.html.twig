@@ -20,10 +20,16 @@
 	</head>
 	<body>
 		{% include 'partials/_navbar.html.twig' %}
-		{% for messages in app.flashes %}
+		{% for label, messages in app.flashes %}
 			{% for message in messages %}
 				<div class="text-center py-2">
-					<div class="p-2 bg-gray-800 text-gray-100 rounded-lg flex items-center justify-center" role="alert">
+					<div class="
+						                    p-4 rounded-lg flex items-center justify-center text-white
+						                    {% if label == 'success' %} bg-green-500 {% endif %}
+						                    {% if label == 'error' %} bg-red-500 {% endif %}
+						                    {% if label == 'info' %} bg-blue-500 {% endif %}
+						                    {% if label == 'warning' %} bg-yellow-500 {% endif %}
+						                " role="alert">
 						<span class="font-semibold text-sm">
 							{{ message | raw }}
 						</span>
@@ -31,6 +37,7 @@
 				</div>
 			{% endfor %}
 		{% endfor %}
+
 
 		{% block body %}{% endblock %}
 	</body>

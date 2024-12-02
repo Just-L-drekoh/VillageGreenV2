@@ -83,6 +83,13 @@ app_profile:
   defaults:
     role: ROLE_USER
 
+# Modifier le profil
+app_updateProfile:
+  path: /profile/edit/{id}
+  controller: App\Controller\ProfilController::updateProfile
+  defaults:
+    role: ROLE_USER
+
 # Modifier une adresse
 app_updateAddress:
   path: /address/{id}/edit
