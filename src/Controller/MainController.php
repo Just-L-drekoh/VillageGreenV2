@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
-use App\Entity\Product;
 use App\Entity\Rubric;
+use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 class MainController extends AbstractController
 {
@@ -60,11 +63,12 @@ class MainController extends AbstractController
 
     #Cette fonction affichera tous les produits
     #il affiche tous les produits
-    public function products(EntityManagerInterface $entityManager): Response
+    public function products(EntityManagerInterface $entityManager, PaginatorInterface $paginator, Request $request): Response
     {
 
         try {
-            $viewProducts = $entityManager->getRepository(Product::class)->findAll();
+            $data = $entityManager->getRepository(Product::class)->findAll();
+            $viewProducts = $paginator->paginate($data, $request->query->getInt('page', 1), 6);
         } catch (\Exception $e) {
             $this->addFlash('error', 'Impossible de charger les produits');
             return $this->redirectToRoute('app_index');
