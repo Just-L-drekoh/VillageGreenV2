@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\UniqueConstraint(name: 'slug', columns: ['slug'])]
@@ -19,21 +20,30 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['product:read'])]
     private ?string $label = null;
 
     #[ORM\Column(length: 50)]
     private ?string $ref = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['product:read'])]
+
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['product:read'])]
+
     private ?string $content = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['product:read'])]
+
     private ?string $price = null;
 
     #[ORM\Column]
+    #[Groups(['product:read'])]
+
     private ?int $stock = null;
 
     #[ORM\Column]
@@ -50,6 +60,7 @@ class Product
      * @var Collection<int, Image>
      */
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'product')]
+    #[Groups(['product:read'])]
     private Collection $image;
 
     #[ORM\ManyToOne(inversedBy: 'products')]

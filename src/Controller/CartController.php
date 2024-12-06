@@ -18,12 +18,6 @@ class CartController extends AbstractController
 
     public function viewCart(): Response
     {
-        // Get the current cart
-        $cart = $this->cartService->getCart();
-
-        // Return the cart as JSON response
-        return $this->json([
-            'cart' => $cart,
-        ]);
+        return $this->render('cart/index.html.twig', []);
     }
 }

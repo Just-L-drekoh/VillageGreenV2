@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Rubric;
 use App\Entity\Product;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -91,5 +92,18 @@ class MainController extends AbstractController
         }
 
         return $this->render('main/product/productDetails.html.twig', ['product' => $viewProductDetails]);
+    }
+
+    #[Route('/api/products', name: 'api_search', methods: ['GET'])]
+    public function search(Request $request, ProductRepository $productRepository): Response
+    {
+        $query = $request->query->get('q', ''); // Récupère le paramètre de recherche 'q'
+        $products = $productRepository->createQueryBuilder('p')
+            ->where('p.label LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+
+        return $this->json($products, 200, [], ['groups' => 'product:read']);
     }
 }

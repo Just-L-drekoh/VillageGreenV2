@@ -22,6 +22,7 @@ Encore
    */
   .addEntry("app", "./assets/app.js")
   .addEntry("navbar", "./assets/navbar.js")
+  .addEntry("searchbar", "./React/SearchBar/main.jsx")
   // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
   .splitEntryChunks()
 
@@ -57,12 +58,13 @@ Encore
   //.enableSassLoader()
 
   //enablePostCssLoader
-  .enablePostCssLoader();
-// uncomment if you use TypeScript
-//.enableTypeScriptLoader()
+  .enablePostCssLoader()
 
-// uncomment if you use React
-//.enableReactPreset()
+  // uncomment if you use TypeScript
+  //.enableTypeScriptLoader()
+
+  // uncomment if you use React
+  .enableReactPreset();
 
 // uncomment to get integrity="..." attributes on your script & link tags
 // requires WebpackEncoreBundle 1.4 or higher

@@ -5,10 +5,17 @@
 
 
 {% block body %}
-	<div class=" h-64 m-2 rounded-xl shadow-xl">
+	<div class=" h-64 m-2 rounded-xl shadow-xl mb-8">
 		<img class="hidden lg:flex w-full h-full object-cover rounded-xl" src="{{ asset('images/hands-1851426_1920.webp') }}" alt="Hands image"/>
 		<div class="mt-4 flex justify-center items-center text-white">
 			<h1 class="text-4xl mt-4 font-serif text-black">Bienvenue sur Village Green</h1>
 		</div>
+		<div id="root"></div>
+
 	</div>
+
+{% endblock %}
+
+{% block javascripts %}
+	{{encore_entry_script_tags('searchbar') }}
 {% endblock %}
