@@ -68,7 +68,7 @@ class MainController extends AbstractController
 
         try {
             $data = $entityManager->getRepository(Product::class)->findAll();
-            $viewProducts = $paginator->paginate($data, $request->query->getInt('page', 1), 6);
+            $viewProducts = $paginator->paginate($data, $request->query->getInt('page', 1), 12);
         } catch (\Exception $e) {
             $this->addFlash('error', 'Impossible de charger les produits');
             return $this->redirectToRoute('app_index');

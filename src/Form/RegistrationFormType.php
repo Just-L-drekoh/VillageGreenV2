@@ -79,7 +79,9 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('siret', TextType::class, [
                 'label' => 'SIRET',
+                'required' => false,
                 'constraints' => [
+
                     new Length([
                         'min' => 14,
                         'max' => 14,

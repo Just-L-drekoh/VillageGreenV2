@@ -69,6 +69,7 @@ class AppFixtures extends Fixture
                 $user->setVerified(false);
                 $user->setRef("Cli:" . mt_rand(10000, 99999));
                 $user->setRoles(['ROLE_USER']);
+                $user->setCoef(1.0);
                 $user->setService($faker->randomElement($manager->getRepository(\App\Entity\Service::class)->findAll()));
                 $manager->persist($user);
             } catch (\Exception $e) {
@@ -195,7 +196,7 @@ class AppFixtures extends Fixture
         }
 
         # Creation de Produit dans la BDD
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             try {
                 $product = new \App\Entity\Product();
                 $product->setLabel($faker->sentence);
