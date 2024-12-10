@@ -1,81 +1,105 @@
-{% extends 'base.html.twig' %} {% block title %} Votre Panier |
-{{ app.user.firstName }}
-{% endblock %} {% block body %}
-<div class="container mx-auto p-6 bg-gray-100 shadow-lg rounded-xl mt-12">
-  <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">
-    Votre Panier
-    <span class="text-blue-600"
-      >{{ app.user.firstName }} {{ app.user.lastName }}</span
-    >
-  </h1>
+{% extends 'base.html.twig' %}
+{% block title %}
+	Votre Panier |
+	{{ app.user.firstName }}
+{% endblock %}
+{% block body %}
+	<div class="container mx-auto p-6 bg-gray-100 shadow-lg rounded-xl mt-12">
+		<h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">
+			Votre Panier
+			<span class="text-blue-600">{{ app.user.firstName }}
+				{{ app.user.lastName }}</span>
+		</h1>
 
-  {% if products|length == 0 %}
-  <p class="text-lg font-medium text-gray-600 text-center mb-8">
-    Votre panier est vide
-  </p>
-  <a
-    href="{{ path('app_products') }}"
-    class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center"
-    >Venez Découvrir nos instruments</a
-  >
-  {% else %}
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for product in products %}
-    <div class="bg-white p-4 shadow-md rounded-lg">
-      <h2 class="text-xl font-semibold text-gray-700">
-        {{ product.product.label }}
-      </h2>
-      {% if product.product.image|length > 0 %}
-      <div class="overflow-hidden rounded-lg mb-4">
-        <img
-          src="{{ product.product.image[0].img }}"
-          alt="{{ product.product.label }}"
-          class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
-        />
-      </div>
-      {% endif %}
-      <p class="text-gray-600 mt-2">
-        Prix Unitaire :
-        <span class="font-bold">{{ product.product.price }} €</span>
-      </p>
-      <div class="mt-4 flex items-center space-x-4">
-        <a href="{{ path('cart_remove', { id: product.product.id }) }}">
-          <button
-            class="bg-red-500 text-white font-bold px-3 py-3 rounded hover:bg-red-600 transition"
-            aria-label="Diminuer la quantité"
-          >
-            -
-          </button>
-        </a>
-        <span class="text-lg font-bold text-gray-700">{{
+		{% if products|length == 0 %}
+			<p class="text-lg font-medium text-gray-600 text-center mb-8">
+				Votre panier est vide
+			</p>
+			<a href="{{ path('product_index') }}" class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center">Venez Découvrir nos instruments</a>
+		{% else %}
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				{% for product in products %}
+
+					<div class="bg-white p-4 shadow-md rounded-lg">
+						<h2 class="text-xl font-semibold text-gray-700">
+							{{ product.product.label }}
+						</h2>
+						{% if product.product.image|length > 0 %}
+							<div class="overflow-hidden rounded-lg mb-4">
+								<img src="{{ product.product.image[0].img }}" alt="{{ product.product.label }}" class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"/>
+							</div>
+						{% endif %}
+						<p class="text-gray-600 mt-2">
+							Prix Unitaire :
+							<span class="font-bold">{{ product.product.price }}
+								€</span>
+						</p>
+						<div class="mt-4 flex items-center space-x-4">
+							<a href="{{ path('cart_remove', { id: product.product.id }) }}">
+								<button class="bg-red-500 text-white font-bold px-3 py-3 rounded hover:bg-red-600 transition" aria-label="Diminuer la quantité">
+									-
+								</button>
+							</a>
+							<span class="text-lg font-bold text-gray-700">{{
           product.quantity
         }}</span>
-        <a href="{{ path('cart_add', { id: product.product.id }) }}">
-          <button
-            class="bg-green-500 text-white font-bold px-3 py-3 rounded hover:bg-green-600 transition"
-            aria-label="Augmenter la quantité"
-          >
-            +
-          </button>
-        </a>
+							<a href="{{ path('cart_add', { id: product.product.id }) }}">
+								<button class="bg-green-500 text-white font-bold px-3 py-3 rounded hover:bg-green-600 transition" aria-label="Augmenter la quantité">
+									+
+								</button>
+							</a>
 
-        <a href="{{ path('cart_allRemove', { id: product.product.id }) }}">
-          <button
-            class="bg-red-500 text-white font-bold px-3 py-3 rounded hover:bg-red-600 transition"
-            aria-label="Augmenter la quantité"
-          >
-            Tout Supprimer
-          </button>
-        </a>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-  <div class="mt-8 text-center">
-    <p class="text-2xl font-bold text-gray-800">
-      Total : <span class="text-blue-600">{{ total }} €</span>
-    </p>
-  </div>
-  {% endif %}
-</div>
+							<a href="{{ path('cart_allRemove', { id: product.product.id }) }}">
+								<button class="bg-red-500 text-white font-bold px-3 py-3 rounded hover:bg-red-600 transition" aria-label="Augmenter la quantité">
+									Tout Supprimer
+								</button>
+							</a>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+			<div class="mt-8 text-center">
+				<p class="text-2xl font-bold text-gray-800">
+					Total :
+					<span class="text-blue-600">{{ total }}
+						€</span>
+				</p>
+				{{ form_start(form, { 'attr': {'class': 'mb-5 w-full border rounded px-3 py-2 shadow-sm'}}
+				)}}
+
+				<div class="mt-4">
+					{{ form_row(form.paiement, {'attr': {'class': 'w-full border rounded px-3 py-2 shadow-sm'}}) }}
+				</div>
+
+				{{ form_end(form) }}
+				{% if session.get('paiement') == 'carte bancaire' %}
+
+					<div>
+						<p class="text-2xl font-bold text-gray-800">
+							Le mode de paiement sélectionné est :
+							{{ session.get('paiement') }}
+						</p>
+						<p class="text-2xl font-bold text-gray-800">
+							Nom sur la carte :
+							{{ app.user.firstName }}
+						</p>
+						<p class="text-2xl font-bold text-gray-800">
+							Numéro de carte :
+																																										5363756363736
+						</p>
+					</div>
+				{% else %}
+					<p class="text-2xl font-bold text-gray-800">
+						Le mode de paiement sélectionné est :
+						{{ session.get('paiement') }}
+					</p>
+				{% endif %}
+
+
+				<a href="{{path('cart_order')}}" class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center">
+					<button>Passez la Commande</button>
+				</a>
+			</div>
+		{% endif %}
+	</div>
 {% endblock %}

@@ -1,29 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 		<title>
 			{% block title %}Welcome!
 			{% endblock %}
 		</title>
+
+		<!-- CSS principal -->
 		{{ encore_entry_link_tags('app') }}
 
 		{% block stylesheets %}{% endblock %}
+
+		<!-- JavaScript principal -->
 		{{ encore_entry_script_tags('app') }}
-		{{encore_entry_script_tags('navbar') }}
+		{{ encore_entry_script_tags('navbar') }}
 
 		{% block javascripts %}{% endblock %}
 	</head>
 	<body>
+		<!-- Navbar -->
 		{% include 'partials/_navbar.html.twig' %}
+
+		<!-- Flash messages -->
 		{% for label, messages in app.flashes %}
 			{% for message in messages %}
 				<div class="text-center py-2">
-					<div class="
-																		        p-4 rounded-lg flex items-center justify-center text-white
-																		        {% if label == 'success' %} bg-green-500 {% elseif label == 'error' %} bg-red-500 {% elseif label == 'info' %} bg-blue-500 {% elseif label == 'warning' %} bg-yellow-500 {% endif %}
-																		    " role="alert">
+					<div class="p-4 rounded-lg flex items-center justify-center text-white
+						                    {% if label == 'success' %} bg-green-500
+						                    {% elseif label == 'error' %} bg-red-500
+						                    {% elseif label == 'info' %} bg-blue-500
+						                    {% elseif label == 'warning' %} bg-yellow-500
+						                    {% endif %}" role="alert">
 						<span class="font-semibold text-sm">
 							{{ message | raw }}
 						</span>
@@ -32,9 +41,10 @@
 			{% endfor %}
 		{% endfor %}
 
-
+		<!-- Contenu principal -->
 		{% block body %}{% endblock %}
 
+		<!-- Footer -->
 		{% include 'partials/_footer.html.twig' %}
 	</body>
 </html>

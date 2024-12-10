@@ -3,12 +3,3 @@ controllers:
     path: ../src/Controller/
     namespace: App\Controller
   type: attribute
-
-#############################################
-###################API#######################
-############################################
-
-# Route pour appel de l'API de tout les produits
-api_products:
-  path: /api/products
-  controller: App\Controller\ApiController::SearchProducts

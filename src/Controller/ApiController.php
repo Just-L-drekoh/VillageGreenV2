@@ -8,8 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
+#[Route('/api', name: 'api_')]
 class ApiController extends AbstractController
 {
+    #[Route('/search', name: 'search', methods: ['GET'])]
     public function SearchProducts(Request $request, ProductRepository $productRepository): Response
     {
         $query = $request->query->get('q', ''); // Récupère le paramètre de recherche 'q'
