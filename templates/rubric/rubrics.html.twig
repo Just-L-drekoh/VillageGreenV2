@@ -34,7 +34,7 @@
 										<p class="text-gray-500 mt-2 text-sm">{{ subrubric.content }}</p>
 									</li>
 
-									<a href="{{ path('app_productsByRubric', {'slug': subrubric.slug}) }}" class=" px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+									<a href="{{ path('product_productsByRubric', {'slug': subrubric.slug}) }}" class=" px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
 										Voir les instruments
 									</a>
 								{% endfor %}

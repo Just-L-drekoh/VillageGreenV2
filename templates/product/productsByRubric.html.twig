@@ -29,11 +29,11 @@
 						{{ product.price }}
 						€</p>
 
-					<a href="{{ path('app_productDetails', {'slug': product.slug}) }}" class=" px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+					<a href="{{ path('product_details', {'slug': product.slug}) }}" class=" px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
 						Voir l'instrument
 					</a>
 
-					<a href="#" class="inline-block px-4 py-2 bg-blue-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+					<a href="{{ path('cart_add', {'id': product.id})}}" class="inline-block px-4 py-2 bg-blue-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
 						Ajouter au panier
 					</a>
 

@@ -77,19 +77,19 @@
 			</div>
 
 			<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center">
-				<a href="{{ path('app_changePassword', {'id': user.id}) }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
+				<a href="{{ path('app_change_password', {'id': user.id}) }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
 					Changer mon mot de passe
 				</a>
 			</div>
 
 			<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center">
-				<a href="{{ path('app_updateProfile', {'id': user.id}) }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
+				<a href="{{ path('profile_update', {'id': user.id}) }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
 					Modifier mon profil
 				</a>
 			</div>
 
 			<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center">
-				<a href="{{ path('app_addAddress') }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
+				<a href="{{ path('address_add') }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
 					Ajouter une adresse
 				</a>
 			</div>
@@ -101,12 +101,12 @@
 			<div class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
 				<p class="font-medium text-center">
 					Votre compte n'est pas encore activé. Cliquez sur le bouton ci-dessous
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																      pour recevoir un nouvel e-mail d'activation.
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														      pour recevoir un nouvel e-mail d'activation.
 				</p>
 			</div>
 
 			<div class="mt-6 text-center">
-				<a href="{{ path('app_resend') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+				<a href="{{ path('app_resend_email') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
 					Renvoyer l'e-mail de vérification
 				</a>
 			</div>
@@ -129,15 +129,15 @@
 					</p>
 					<p class="text-sm text-gray-600">{{ address.Type }}</p>
 
-					<a href="{{ path('app_updateAddress', {'id': address.id}) }}" class="text-blue-600 hover:underline px-4 py-2 rounded-md">Modifier</a>
-					<a href="{{ path('app_deleteAddress', {'id': address.id}) }}" class="text-red-600 hover:underline px-4 py-2 rounded-md">Supprimer</a>
+					<a href="{{ path('address_update', {'id': address.id}) }}" class="text-blue-600 hover:underline px-4 py-2 rounded-md">Modifier</a>
+					<a href="{{ path('address_delete', {'id': address.id}) }}" class="text-red-600 hover:underline px-4 py-2 rounded-md">Supprimer</a>
 
 				</div>
 			{% endfor %}
 		</div>
 	</p>
 </div>
-<div class="container mx-auto mt-12 p-6 bg-gray-100 shadow-lg rounded-xl">
+<div class="container mx-auto mt-12 p-6 bg-gradient-to-r from-blue-100 via-red-100 to-green-100 shadow-lg rounded-xl">
 	<h1 class="text-4xl font-bold text-gray-800 text-center mb-6">Vos Commandes</h1>
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 		{% if user.orders is none or user.orders|length == 0 %}

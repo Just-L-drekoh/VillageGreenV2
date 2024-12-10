@@ -60,7 +60,6 @@ class Product
      * @var Collection<int, Image>
      */
     #[ORM\OneToMany(targetEntity: Image::class, mappedBy: 'product')]
-    #[Groups(['product:read'])]
     private Collection $image;
 
     #[ORM\ManyToOne(inversedBy: 'products')]

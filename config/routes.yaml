@@ -4,109 +4,11 @@ controllers:
     namespace: App\Controller
   type: attribute
 
-# Toutes les Routes
+#############################################
+###################API#######################
+############################################
 
-# Authentification
-app_register:
-  path: /register
-  controller: App\Controller\RegistrationController::register
-
-#verifier email
-app_verify:
-  path: /verif/{token}
-  controller: App\Controller\RegistrationController::verifUser
-
-#resend email
-app_resend:
-  path: /resend
-  controller: App\Controller\RegistrationController::resendVerification
-
-# Connexion
-app_login:
-  path: /login
-  controller: App\Controller\SecurityController::login
-
-# Deconnexion
-app_logout:
-  path: /logout
-  controller: App\Controller\SecurityController::logout
-
-#Changer de mot de passe
-app_changePassword:
-  path: /changePassword/{id}
-  controller: App\Controller\SecurityController::changePassword
-  defaults:
-    role: ROLE_USER
-
-# Accueil
-app_index:
-  path: /
-  controller: App\Controller\MainController::index
-  defaults:
-    role: ROLE_USER
-
-# Toutes les rubriques
-app_rubrics:
-  path: /rubrics
-  controller: App\Controller\MainController::rubrics
-
-# Tout les produits d'une rubrique
-app_productsByRubric:
-  path: /products/{slug}
-  controller: App\Controller\MainController::productsByRubric
-
-#Tout les Produits
-app_products:
-  path: /products
-  controller: App\Controller\MainController::products
-  defaults:
-    role: ROLE_USER
-
-# Details d'un produit
-app_productDetails:
-  path: /product/{slug}
-  controller: App\Controller\MainController::productDetails
-  defaults:
-    role: ROLE_USER
-
-# Panier
-app_cart:
-  path: /cart
-  controller: App\Controller\CartController::viewCart
-  defaults:
-    role: ROLE_USER
-
-# Profil
-app_profile:
-  path: /profile
-  controller: App\Controller\ProfilController::profile
-  defaults:
-    role: ROLE_USER
-
-# Modifier le profil
-app_updateProfile:
-  path: /profile/edit/{id}
-  controller: App\Controller\ProfilController::updateProfile
-  defaults:
-    role: ROLE_USER
-
-# Modifier une adresse
-app_updateAddress:
-  path: /address/{id}/edit
-  controller: App\Controller\ProfilController::updateAddress
-  defaults:
-    role: ROLE_USER
-
-# Supprimer une adresse
-app_deleteAddress:
-  path: /address/{id}/delete
-  controller: App\Controller\ProfilController::deleteAddress
-  defaults:
-    role: ROLE_USER
-
-# Ajouter une adresse
-app_addAddress:
-  path: /address/new
-  controller: App\Controller\ProfilController::addAddress
-  defaults:
-    role: ROLE_USER
+# Route pour appel de l'API de tout les produits
+api_products:
+  path: /api/products
+  controller: App\Controller\ApiController::SearchProducts

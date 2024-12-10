@@ -1,67 +1,81 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %} Votre Panier |
+{{ app.user.firstName }}
+{% endblock %} {% block body %}
+<div class="container mx-auto p-6 bg-gray-100 shadow-lg rounded-xl mt-12">
+  <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">
+    Votre Panier
+    <span class="text-blue-600"
+      >{{ app.user.firstName }} {{ app.user.lastName }}</span
+    >
+  </h1>
 
-{% block title %}Votre Panier |
-	{{ app.user.firstName }}
-{% endblock %}
+  {% if products|length == 0 %}
+  <p class="text-lg font-medium text-gray-600 text-center mb-8">
+    Votre panier est vide
+  </p>
+  <a
+    href="{{ path('app_products') }}"
+    class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center"
+    >Venez Découvrir nos instruments</a
+  >
+  {% else %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for product in products %}
+    <div class="bg-white p-4 shadow-md rounded-lg">
+      <h2 class="text-xl font-semibold text-gray-700">
+        {{ product.product.label }}
+      </h2>
+      {% if product.product.image|length > 0 %}
+      <div class="overflow-hidden rounded-lg mb-4">
+        <img
+          src="{{ product.product.image[0].img }}"
+          alt="{{ product.product.label }}"
+          class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+        />
+      </div>
+      {% endif %}
+      <p class="text-gray-600 mt-2">
+        Prix Unitaire :
+        <span class="font-bold">{{ product.product.price }} €</span>
+      </p>
+      <div class="mt-4 flex items-center space-x-4">
+        <a href="{{ path('cart_remove', { id: product.product.id }) }}">
+          <button
+            class="bg-red-500 text-white font-bold px-3 py-3 rounded hover:bg-red-600 transition"
+            aria-label="Diminuer la quantité"
+          >
+            -
+          </button>
+        </a>
+        <span class="text-lg font-bold text-gray-700">{{
+          product.quantity
+        }}</span>
+        <a href="{{ path('cart_add', { id: product.product.id }) }}">
+          <button
+            class="bg-green-500 text-white font-bold px-3 py-3 rounded hover:bg-green-600 transition"
+            aria-label="Augmenter la quantité"
+          >
+            +
+          </button>
+        </a>
 
-{% block body %}
-	<div class="container mx-auto p-6 bg-gray-100 shadow-lg rounded-xl mt-12">
-		<h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">
-			Votre Panier
-			<span class="text-blue-600">{{ app.user.firstName }}
-				{{ app.user.lastName }}</span>
-		</h1>
-
-		<div class="bg-white p-6 rounded-lg shadow-md">
-			{# {% if cartItems is not empty %}
-																			<div class="overflow-x-auto">
-																				<table class="min-w-full table-auto">
-																					<thead>
-																						<tr class="bg-gray-200 text-left">
-																							<th class="py-2 px-4">Produit</th>
-																							<th class="py-2 px-4">Quantité</th>
-																							<th class="py-2 px-4">Prix Unitaire</th>
-																							<th class="py-2 px-4">Total</th>
-																							<th class="py-2 px-4"></th>
-																						</tr>
-																					</thead>
-																					<tbody>
-																						{% for item in cartItems %}
-																							<tr class="border-b hover:bg-gray-50">
-																								<td class="py-2 px-4">{{ item.product.name }}</td>
-																								<td class="py-2 px-4">{{ item.quantity }}</td>
-																								<td class="py-2 px-4">{{ item.product.price }}
-																									€</td>
-																								<td class="py-2 px-4">{{ item.product.price * item.quantity }}
-																									€</td>
-																								<td class="py-2 px-4 text-right">
-																									<a href="{{ path('remove_from_cart', {'productId': item.product.id}) }}" class="text-red-600 hover:text-red-800">
-																										Supprimer
-																									</a>
-																								</td>
-																							</tr>
-																						{% endfor %}
-																					</tbody>
-																				</table>
-																			</div> #}
-
-			{# <!-- Total du panier -->
-													<div class="mt-6 text-right"> <p class="text-xl font-semibold text-gray-800">Total :
-														{{ totalAmount }}
-														€</p>
-												</div> #}
-
-			<!-- Boutons -->
-				<div class="mt-8 flex justify-between"> <a href="{{path('app_products')}}" class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-md hover:bg-gray-300 transition duration-300">
-					Continuer vos achats
-				</a>
-				<a href="#" class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
-					Passer à la caisse
-				</a>
-			</div>
-
-			<p class="text-center text-lg text-gray-600">Votre panier est vide.</p>
-
-		</div>
-	</div>
+        <a href="{{ path('cart_allRemove', { id: product.product.id }) }}">
+          <button
+            class="bg-red-500 text-white font-bold px-3 py-3 rounded hover:bg-red-600 transition"
+            aria-label="Augmenter la quantité"
+          >
+            Tout Supprimer
+          </button>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="mt-8 text-center">
+    <p class="text-2xl font-bold text-gray-800">
+      Total : <span class="text-blue-600">{{ total }} €</span>
+    </p>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

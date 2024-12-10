@@ -68,22 +68,22 @@
 				Merci de vous être inscrit sur
 				<strong>Village Green</strong>
 				! Pour activer
-				        votre compte et accéder à toutes nos fonctionnalités, veuillez cliquer sur
-				        le bouton ci-dessous :
+												        votre compte et accéder à toutes nos fonctionnalités, veuillez cliquer sur
+												        le bouton ci-dessous :
 			</p>
 
 			<!-- Activation Button -->
 			<div style="text-align: center;">
-				<a href="{{ absolute_url(path('app_verify', { token: token })) }}" class="btn" style="background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600;">Activer mon compte</a>
+				<a href="{{ absolute_url(path('app_verify_email', { token: token })) }}" class="btn" style="background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600;">Activer mon compte</a>
 			</div>
 
 			<!-- Token (Optional Debug Info) -->
 			<p style="font-size: 14px; color: #9ca3af; margin-top: 20px; text-align: center;">
 				Si le bouton ci-dessus ne fonctionne pas, copiez et collez le lien suivant
-				        dans votre navigateur :
+												        dans votre navigateur :
 			</p>
 			<p style="font-size: 14px; color: #1d4ed8; text-align: center; word-break: break-all;">
-				{{ absolute_url(path('app_verify', { token: token })) }}
+				{{ absolute_url(path('app_verify_email', { token: token })) }}
 			</p>
 
 			<!-- Closing -->
