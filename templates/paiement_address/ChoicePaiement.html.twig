@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PaiementAddressController!
+{% endblock %}
+
+{% block body %}
+	{{ form_start(formPaiementMethod, {'attr': {'class': 'mb-5 w-full border rounded px-3 py-2 shadow-sm'}}) }}
+
+	<div class="mt-4">
+		{{ form_row(formPaiementMethod.paiement, {'attr': {'class': 'w-full border rounded px-3 py-2 shadow-sm'}}) }}
+	</div>
+
+	{{ form_end(formPaiementMethod) }}
+
+	{% set paiement = app.session.get('paiement') %}
+
+	{% if paiement == 'carte bancaire' %}
+		<div class="mt-4">
+			<p class="text-2xl font-bold text-gray-800">
+				Le mode de paiement sélectionné est :
+				{{ paiement }}
+			</p>
+			<p class="text-2xl font-bold text-gray-800">
+				Ajouter une carte bancaire pour payer :
+			</p>
+
+			{% if app.session.get('BankCart') is empty %}
+				<div class="flex justify-center items-center bg-gradient-to-br from-gray-100 to-blue-50">
+					<div class="w-full max-w-md bg-white shadow-2xl rounded-lg p-8">
+						<h1 class="text-3xl font-extrabold text-center text-indigo-600 mb-8">Paiement par Carte Bancaire</h1>
+						{{ form_start(formBankCart, {'attr': {'class': 'space-y-6'}}) }}
+
+						{% for field, label in {
+                            'name': 'Nom',
+                            'number': 'Numéro de Carte',
+                            'cvv': 'CVV',
+                            'date': 'Date d\'Expiration'
+                        } %}
+                            <div>
+                                {{ form_label(attribute(formBankCart, field), label, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                                {{ form_widget(attribute(formBankCart, field), {'attr': {'class': 'mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2'}}) }}
+                                {{ form_errors(attribute(formBankCart, field)) }}
+                            </div>
+                        {% endfor %}
+
+                        <div class="flex justify-center">
+                            {{ form_widget(formBankCart.submit, {'attr': {'class': 'w-full px-6 py-3 bg-indigo-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'}}) }}
+                        </div>
+
+                        {{ form_end(formBankCart) }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="flex justify-center items-center bg-gray-50 py-12">
+                    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mode de Paiement Enregistré</h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-medium text-gray-700">Nom :</span>
+                                <span class="text-lg text-gray-900">{{ app.session.get('BankCart')['name'] }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-medium text-gray-700">Numéro de Carte :</span>
+                                <span class="text-lg text-gray-900">**** **** **** ****</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-medium text-gray-700">CVV :</span>
+                                <span class="text-lg text-gray-900">{{ app.session.get('BankCart')['cvv'] }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-medium text-gray-700">Date d'Expiration :</span>
+                                <span class="text-lg text-gray-900">{{ app.session.get('BankCart')['date'] }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+						</div>
+
+					{% elseif paiement == 'virement bancaire' %}
+						<div class="mt-4">
+							<p class="text-2xl font-bold text-gray-800">
+								Le mode de paiement sélectionné est :
+								{{ paiement }}
+							</p>
+							<p class="text-2xl font-bold text-gray-800">
+								Veuillez effectuer un virement bancaire pour finaliser votre paiement.
+							</p>
+
+							<div class="flex justify-center items-center bg-gray-50 py-12">
+								<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+									<h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Détails pour Virement Bancaire</h2>
+									<div class="space-y-6">
+										<div>
+											<h3 class="text-lg font-semibold text-gray-700">Coordonnées Bancaires :</h3>
+											<p class="text-gray-600 mt-2">Banque XYZ</p>
+											<p class="text-gray-600 mt-2">Numéro de Compte: 1234567890</p>
+											<p class="text-gray-600 mt-2">Code IBAN: FR7612345678901234567890123</p>
+											<p class="text-gray-600 mt-2">Code BIC: ABCDXYZ</p>
+										</div>
+
+										<div class="mt-6 text-center">
+											<p class="text-base text-gray-500">Veuillez utiliser votre numéro de commande comme référence lors du virement.</p>
+											<p class="text-sm text-gray-500">Une fois le virement effectué, votre paiement sera traité.</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					{% else %}
+						<div class="mt-4">
+							<p class="text-2xl font-bold text-gray-800">
+								Le mode de paiement sélectionné est :
+								{{ paiement }}
+							</p>
+							<div class="flex justify-center items-center bg-gray-50 py-12">
+								<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+									<h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Mode de Paiement Enregistré</h2>
+									<div class="space-y-6">
+										<div>
+											<h3 class="text-lg font-semibold text-gray-700">Ordre de Chèque à Envoyer :</h3>
+											<p class="text-gray-600 mt-2">VillageGreen Service Paiement</p>
+										</div>
+
+										<div class="mt-6 text-center">
+											<p class="text-base text-gray-500">Veuillez envoyer votre chèque à l'adresse suivante :</p>
+											<p class="text-sm font-semibold text-gray-700 mt-2">VillageGreen, Service Paiement</p>
+											<p class="text-sm text-gray-500">Votre paiement sera traité une fois le chèque reçu.</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+					<a href="{{path('cart_recap')}}" class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center">
+						<button>Voir le Recapitulatif</button>
+					</a>
+				{% endblock %}

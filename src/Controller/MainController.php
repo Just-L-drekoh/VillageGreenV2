@@ -12,12 +12,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-
 class MainController extends AbstractController
 {
     #[Route('/', name: 'VillageGreen_index')]
     public function index(): Response
     {
+
         return $this->render('main/index.html.twig', []);
     }
 }

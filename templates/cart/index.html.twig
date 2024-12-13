@@ -64,40 +64,10 @@
 					<span class="text-blue-600">{{ total }}
 						€</span>
 				</p>
-				{{ form_start(form, { 'attr': {'class': 'mb-5 w-full border rounded px-3 py-2 shadow-sm'}}
-				)}}
-
-				<div class="mt-4">
-					{{ form_row(form.paiement, {'attr': {'class': 'w-full border rounded px-3 py-2 shadow-sm'}}) }}
-				</div>
-
-				{{ form_end(form) }}
-				{% if session.get('paiement') == 'carte bancaire' %}
-
-					<div>
-						<p class="text-2xl font-bold text-gray-800">
-							Le mode de paiement sélectionné est :
-							{{ session.get('paiement') }}
-						</p>
-						<p class="text-2xl font-bold text-gray-800">
-							Nom sur la carte :
-							{{ app.user.firstName }}
-						</p>
-						<p class="text-2xl font-bold text-gray-800">
-							Numéro de carte :
-																																										5363756363736
-						</p>
-					</div>
-				{% else %}
-					<p class="text-2xl font-bold text-gray-800">
-						Le mode de paiement sélectionné est :
-						{{ session.get('paiement') }}
-					</p>
-				{% endif %}
 
 
-				<a href="{{path('cart_order')}}" class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center">
-					<button>Passez la Commande</button>
+				<a href="{{path('validation_cart_address')}}" class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center">
+					<button>Choisissez votre adresse</button>
 				</a>
 			</div>
 		{% endif %}

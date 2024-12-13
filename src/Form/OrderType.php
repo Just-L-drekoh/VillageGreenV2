@@ -13,27 +13,40 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class OrderType extends AbstractType
 {
+    private function getPaiementOptions(?User $user): array
+    {
+        // Vérifier si l'utilisateur est nul
+        if ($user === null || $user->getSiret() === null) {
+            return [
+                'Carte bancaire' => 'carte bancaire',
+            ];
+        }
+
+        return [
+            'Carte bancaire' => 'carte bancaire',
+            'Chèque' => 'cheque',
+            'Virement bancaire' => 'virement bancaire',
+        ];
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
+        $user = $options['user'] ?? null;
+
         $builder
             ->add(
                 'paiement',
                 ChoiceType::class,
-
                 [
                     'mapped' => false,
-                    'choices' => [
-                        'carte bancaire' => 'carte bancaire',
-                        'cheque' => 'cheque',
-                        'virement bancaire' => 'virement bancaire',
-                    ]
+                    'choices' => $this->getPaiementOptions($user),
                 ]
             )
             ->add('submit', SubmitType::class, [
                 'label' => 'Valider le moyen de paiement',
                 'attr' => [
                     'autofocus' => true,
-                    'autofocus-submit' => true,
                 ],
             ]);
     }
@@ -42,6 +55,7 @@ class OrderType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Order::class,
+            'user' => null, // Option personnalisée pour passer l'utilisateur
         ]);
     }
 }

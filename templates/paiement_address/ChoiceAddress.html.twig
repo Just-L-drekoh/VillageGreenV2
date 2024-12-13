@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Choisissez votre adresse de livraison et de facturation
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-4">
+		<h1>Choisissez votre adresse</h1>
+		<p>Veuillez sélectionner une adresse pour la livraison et une autre pour la facturation.</p>
+
+
+		<ul>
+			{% for address in cart.user.address %}
+				<li>
+					<strong>{{ address.address }}</strong><br>
+					{{ address.city }}<br>
+					{{ address.cp }}<br>
+					{{ address.type }}
+				</li>
+			{% endfor %}
+		</ul>
+		<a href="{{path('validation_cart_paiement')}}" class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center">
+			<button>Choisissez votre mode de paiement</button>
+		</a>
+	</div>
+{% endblock %}

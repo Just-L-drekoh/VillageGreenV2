@@ -34,7 +34,7 @@ class AddressController extends AbstractController
 
         if ($existingShipping && $existingBilling) {
             $this->addFlash('warning', 'Vous avez déjà une adresse de livraison et une adresse de facturation.');
-            return $this->redirectToRoute('app_profile');
+            return $this->redirectToRoute('profile_index');
         }
 
         $address = new Address();
@@ -58,7 +58,7 @@ class AddressController extends AbstractController
             $entityManager->persist($address);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_profile');
+            return $this->redirectToRoute('profile_index');
         }
 
         return $this->render('address/addAddress.html.twig', [

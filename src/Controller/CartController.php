@@ -26,22 +26,15 @@ class CartController extends AbstractController
 
         if (!$user) {
             $this->addFlash('warning', 'Vous devez vous connecter pour voir votre panier');
-
             return $this->redirectToRoute('app_login');
-        };
-        $panier = $session->get('panier', []);
+        }
 
+        $panier = $session->get('panier', []);
         $dataProduct = [];
         $total = 0;
         $totalTaxes = 0;
 
-        $form = $this->createForm(OrderType::class);
-        $form->handleRequest($request);
 
-
-        $paiement = $form->get('paiement')->getData();
-
-        $session->set('paiement', $paiement);
 
         foreach ($panier as $id => $quantity) {
             $product = $productRepository->find($id);
@@ -56,28 +49,22 @@ class CartController extends AbstractController
             $priceWithTax = $product->getPrice() * (1 + $taxRate / 100);
             $total += $priceWithTax * $quantity;
             $totalTaxes += ($priceWithTax - $product->getPrice()) * $quantity;
+            $session->set('ttc', $total);
 
             $dataProduct[] = [
                 'product' => $product,
                 'quantity' => $quantity,
                 'priceWithTax' => $priceWithTax,
-                'paiement' => $paiement,
-
-
-
             ];
         }
-        dump($dataProduct);
-
+        dump($session);
         return $this->render('cart/index.html.twig', [
             'products' => $dataProduct,
             'total' => $total,
             'totalTaxes' => $totalTaxes,
-            'form' => $form->createView(),
-            'session' => $session
-
         ]);
     }
+
 
     #[Route('/add/{id}', name: 'add')]
     public function add(Product $product, SessionInterface $session): Response
@@ -90,7 +77,6 @@ class CartController extends AbstractController
         } else {
             $panier[$id] = 1;
         }
-
 
         $session->set('panier', $panier);
 
@@ -180,7 +166,6 @@ class CartController extends AbstractController
             $priceWithTax = $product->getPrice() * (1 + $taxRate / 100);
             $totalAmount += $priceWithTax * $quantity;
 
-            // Création des détails de commande pour chaque produit
             $orderDetail = new OrderDetails();
             $orderDetail->setOrder($order);
             $orderDetail->setProduct($product);
@@ -195,10 +180,8 @@ class CartController extends AbstractController
             return $this->redirectToRoute('cart_index');
         }
 
-        // Définir le montant total de la commande
         $order->setTotal($totalAmount);
 
-        // Sauvegarder la commande et ses détails
         $entityManager->persist($order);
         foreach ($orderDetails as $orderDetail) {
             $entityManager->persist($orderDetail);
@@ -206,10 +189,44 @@ class CartController extends AbstractController
 
         $entityManager->flush();
 
-        // Vider le panier
-        $session->remove('panier');
+        $session->clear();
 
         $this->addFlash('success', 'Votre commande a été enregistrée avec succès');
         return $this->redirectToRoute('profile_index');
+    }
+
+    #[Route('/recap', name: 'recap')]
+    public function recap(ProductRepository $productRepository, SessionInterface $session): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            $this->addFlash('warning', 'Vous devez vous connecter pour voir votre récapitulatif.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        $panier = $session->get('panier', []);
+        $dataProduct = [];
+
+        foreach ($panier as $id => $quantity) {
+            $product = $productRepository->find($id);
+
+            if ($product) {
+                $dataProduct[] = [
+                    'product' => $product,
+                    'quantity' => $quantity,
+                    'label' => $product->getLabel(),
+                ];
+            }
+        }
+
+        return $this->render('cart/recap.html.twig', [
+            'recap' => [
+
+                'products' => $dataProduct,
+
+
+            ],
+        ]);
     }
 }
