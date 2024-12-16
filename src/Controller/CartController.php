@@ -147,7 +147,7 @@ class CartController extends AbstractController
     }
 
     /**
-     * Passe la commande
+     * Passer une commande
      */
     #[Route('/order', name: 'order')]
     public function order(SessionInterface $session, EntityManagerInterface $entityManager): Response
@@ -173,7 +173,6 @@ class CartController extends AbstractController
             return $this->redirectToRoute('cart_index');
         }
 
-        // Création d'une nouvelle commande
         $order = new Order();
         $order->setUser($user);
         $order->setRef('Com:' . uniqid() . mt_rand(100, 999));
@@ -184,6 +183,7 @@ class CartController extends AbstractController
         $order->setDate(new \DateTimeImmutable());
         $order->setStatus('En Attente');
 
+
         $totalAmount = 0;
         $orderDetails = [];
 
@@ -191,11 +191,10 @@ class CartController extends AbstractController
             $product = $entityManager->getRepository(Product::class)->find($id);
 
             if (!$product) {
-                $this->addFlash('warning', "Le produit avec le titre ($id) n'existe pas et a été ignoré.");
+                $this->addFlash('warning', "Le produit avec l'ID ($id) n'existe pas et a été ignoré.");
                 continue;
             }
 
-            // Calcul des détails du produit, incluant les taxes
             $productDetails = $this->calculateProductDetails($product, $quantity);
             $totalAmount += $productDetails['total'];
 
@@ -203,13 +202,13 @@ class CartController extends AbstractController
             $orderDetail->setOrder($order);
             $orderDetail->setProduct($product);
             $orderDetail->setQuantity($quantity);
-            $orderDetail->setPrice($productDetails['priceWithTax']);  // Assurez-vous que le prix avec taxes est stocké
+            $orderDetail->setPrice($productDetails['priceWithTax']);
 
             $orderDetails[] = $orderDetail;
         }
-
+        $order->setTotal($totalAmount);
         if (empty($orderDetails)) {
-            $this->addFlash('warning', "Aucun produit valide dans votre panier.");
+            $this->addFlash('warning', 'Aucun produit valide dans votre panier.');
             return $this->redirectToRoute('cart_index');
         }
 
@@ -225,6 +224,7 @@ class CartController extends AbstractController
         $this->addFlash('success', 'Votre commande a été enregistrée avec succès');
         return $this->redirectToRoute('profile_index');
     }
+
 
     /**
      * Récapitulatif du panier

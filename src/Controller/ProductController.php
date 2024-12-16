@@ -23,7 +23,7 @@ class ProductController extends AbstractController
             $viewProducts = $paginator->paginate($data, $request->query->getInt('page', 1), 12);
         } catch (\Exception $e) {
             $this->addFlash('error', 'Impossible de charger les produits, Veuillez réessayer plus tard');
-            return $this->redirectToRoute('app_index');
+            return $this->redirectToRoute('VillageGreen_index');
         }
 
         return $this->render('product/products.html.twig', ['products' => $viewProducts]);
@@ -36,7 +36,7 @@ class ProductController extends AbstractController
             $viewProductDetails = $entityManager->getRepository(Product::class)->findOneBy(['slug' => $slug]);
         } catch (\Exception $e) {
             $this->addFlash('error', 'Impossible de charger le produit, Veuillez réessayer plus tard');
-            return $this->redirectToRoute('app_index');
+            return $this->redirectToRoute('VillageGreen_index');
         }
 
         return $this->render('product/productDetails.html.twig', ['product' => $viewProductDetails]);
@@ -45,14 +45,12 @@ class ProductController extends AbstractController
     public function productsByRubric(EntityManagerInterface $entityManager, string $slug): Response
     {
         try {
-            #Recherche de la rubrique
             $rubric = $entityManager->getRepository(Rubric::class)->findOneBy(['slug' => $slug]);
 
             if (!$rubric) {
                 throw new \Exception('Rubrique introuvable');
             }
 
-            #Recherche des produits liée a la sous rubrique
             $viewProductByRubric = $entityManager->getRepository(Product::class)->findBy(['rubric' => $rubric]);
 
             return $this->render('product/productsByRubric.html.twig', [
@@ -61,7 +59,7 @@ class ProductController extends AbstractController
             ]);
         } catch (\Exception $e) {
             $this->addFlash('error', 'Impossible de charger les instruments par rubrique');
-            return $this->redirectToRoute('app_index');
+            return $this->redirectToRoute('VillageGreen_index');
         }
     }
 }

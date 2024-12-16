@@ -110,6 +110,7 @@ class AddressController extends AbstractController
         $entityManager->remove($address);
         $entityManager->flush();
 
+
         return $this->redirectToRoute('profile_index');
     }
 }

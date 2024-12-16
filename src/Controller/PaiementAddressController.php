@@ -28,10 +28,11 @@ class PaiementAddressController extends AbstractController
 
             $user = $this->getUser();
 
-
-
+            $address = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
+            dump($address);
             if ($user) {
                 $session->set('user', $user);
+                $session->set('address', $address);
             } else {
                 $this->addFlash('error', 'Utilisateur non authentifié.');
                 return $this->redirectToRoute('app_login');
