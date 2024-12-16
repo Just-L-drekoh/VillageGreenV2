@@ -2,32 +2,36 @@
 
 namespace App\Controller;
 
-use App\Form\BankCartType;
+use App\Entity\Address;
 use App\Form\OrderType;
+use App\Form\BankCartType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 
 
 #[Route('/cart/validation-paiement', name: 'validation_cart_')]
 class PaiementAddressController extends AbstractController
 {
     #[Route('/address', name: 'address')]
-    public function ChoicesAddress(SessionInterface $session): Response
+    public function ChoicesAddress(SessionInterface $session, EntityManagerInterface $entityManager): Response
     {
         try {
             $cart = $session->get('panier', []);
-
             if (empty($cart)) {
                 $this->addFlash('warning', 'Votre panier est vide');
                 return $this->redirectToRoute('cart_index');
             }
 
             $user = $this->getUser();
+
+
+
             if ($user) {
-                $cart['user'] = $user;
+                $session->set('user', $user);
             } else {
                 $this->addFlash('error', 'Utilisateur non authentifié.');
                 return $this->redirectToRoute('app_login');
@@ -35,9 +39,9 @@ class PaiementAddressController extends AbstractController
         } catch (\Exception $e) {
             $cart = [];
         }
-
         return $this->render('paiement_address/ChoiceAddress.html.twig', [
             'cart' => $cart,
+            'user' => $user
         ]);
     }
 
@@ -76,7 +80,6 @@ class PaiementAddressController extends AbstractController
                 'date' => $dataBankCart['date'],
             ]);
         }
-        dump($session);
 
         return $this->render('paiement_address/ChoicePaiement.html.twig', [
             'formPaiementMethod' => $formPaiementMethod->createView(),

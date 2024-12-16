@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Address;
-
 use App\Form\AddressFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,30 +22,17 @@ class AddressController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $existingShipping = $entityManager->getRepository(Address::class)->findOneBy([
-            'type' => 'Livraison',
-            'user' => $user
-        ]);
-        $existingBilling = $entityManager->getRepository(Address::class)->findOneBy([
-            'type' => 'Facturation',
-            'user' => $user
-        ]);
+        $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
+        $availableTypes = $this->getAvailableTypes($existingAddresses);
 
-        if ($existingShipping && $existingBilling) {
+        if (empty($availableTypes)) {
             $this->addFlash('warning', 'Vous avez déjà une adresse de livraison et une adresse de facturation.');
             return $this->redirectToRoute('profile_index');
         }
 
         $address = new Address();
-        $address->setUser($user);
-        $address->setDefault(true);
-        $availableTypes = [];
-        if (!$existingShipping) {
-            $availableTypes['Livraison'] = 'Livraison';
-        }
-        if (!$existingBilling) {
-            $availableTypes['Facturation'] = 'Facturation';
-        }
+        $address->setUser($user)
+            ->setDefault(true);
 
         $form = $this->createForm(AddressFormType::class, $address, [
             'available_types' => $availableTypes,
@@ -58,6 +44,7 @@ class AddressController extends AbstractController
             $entityManager->persist($address);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Adresse ajoutée avec succès.');
             return $this->redirectToRoute('profile_index');
         }
 
@@ -70,40 +57,51 @@ class AddressController extends AbstractController
     public function updateAddress(Request $request, Address $address, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
-        $address = $entityManager->getRepository(Address::class)->find($address->getId());
 
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-        $addresstype = $address->getType();
 
         if ($address->getUser() !== $user) {
             return $this->redirectToRoute('app_profile');
         }
 
-        $availableTypes = [];
+        $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
+        $usedTypes = array_map(fn($addr) => $addr->getType(), $existingAddresses);
 
-        $availableTypes[$addresstype] = $addresstype;
+        $availableTypes = $this->getAvailableTypes($existingAddresses, $address->getType());
 
         $form = $this->createForm(AddressFormType::class, $address, [
-
             'available_types' => $availableTypes,
-
             'csrf_protection' => true,
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             $entityManager->persist($address);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_profile');
+            $this->addFlash('success', 'Adresse mise à jour avec succès.');
+            return $this->redirectToRoute('profile_index');
         }
 
-        return $this->render('address/uptadeAddress.html.twig', [
+        return $this->render('address/updateAddress.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    private function getAvailableTypes(array $existingAddresses, string $currentType = null): array
+    {
+        $types = ['Livraison', 'Facturation'];
+        $usedTypes = array_map(fn($address) => $address->getType(), $existingAddresses);
+
+        if ($currentType && !in_array($currentType, $usedTypes)) {
+            $usedTypes[] = $currentType;
+        }
+
+        $availableTypes = array_diff($types, $usedTypes);
+
+        return array_combine($availableTypes, $availableTypes);
     }
 
     #[Route('/delete/{id}', name: 'delete')]
@@ -111,6 +109,7 @@ class AddressController extends AbstractController
     {
         $entityManager->remove($address);
         $entityManager->flush();
-        return $this->redirectToRoute('app_profile');
+
+        return $this->redirectToRoute('profile_index');
     }
 }

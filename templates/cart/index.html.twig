@@ -1,75 +1,80 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}
-	Votre Panier |
+	Panier de
 	{{ app.user.firstName }}
 {% endblock %}
+
 {% block body %}
-	<div class="container mx-auto p-6 bg-gray-100 shadow-lg rounded-xl mt-12">
-		<h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">
-			Votre Panier
-			<span class="text-blue-600">{{ app.user.firstName }}
-				{{ app.user.lastName }}</span>
-		</h1>
+	<main
+		class="container mx-auto px-4 py-12 bg-white shadow-lg rounded-xl max-w-7xl">
+
+		<!-- Header de la page -->
+		<header class="text-center mb-8">
+			<h1 class="text-4xl font-bold text-gray-800">
+				Votre Panier
+			</h1>
+		</header>
 
 		{% if products|length == 0 %}
-			<p class="text-lg font-medium text-gray-600 text-center mb-8">
-				Votre panier est vide
-			</p>
-			<a href="{{ path('product_index') }}" class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center">Venez Découvrir nos instruments</a>
+			<!-- Section Panier Vide -->
+			<section class="text-center">
+				<p class="text-lg text-gray-600 mb-4">Votre panier est vide.</p>
+				<a href="{{ path('product_index') }}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition transform hover:scale-105">
+					Découvrez nos produits
+				</a>
+			</section>
 		{% else %}
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			<!-- Section Liste des Produits -->
+			<section class="space-y-8">
 				{% for product in products %}
-
-					<div class="bg-white p-4 shadow-md rounded-lg">
-						<h2 class="text-xl font-semibold text-gray-700">
-							{{ product.product.label }}
-						</h2>
-						{% if product.product.image|length > 0 %}
-							<div class="overflow-hidden rounded-lg mb-4">
-								<img src="{{ product.product.image[0].img }}" alt="{{ product.product.label }}" class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"/>
+					<article class="flex items-center justify-between bg-gray-50 p-6 rounded-lg shadow-md">
+						<div
+							class="flex items-center space-x-6">
+							<!-- Image produit -->
+							{% if product.product.image|length > 0 %}
+								<img src="{{ product.product.image[0].img }}" alt="{{ product.product.label }}" class="w-32 h-32 object-cover rounded-lg"/>
+							{% else %}
+								<div class="w-32 h-32 bg-gray-300 rounded-lg"></div>
+							{% endif %}
+							<div>
+								<h2 class="text-xl font-semibold text-gray-800">{{ product.product.label }}</h2>
+								<p class="text-lg text-gray-600 mt-2">Prix :
+									<span class="font-bold">{{ product.product.price }}
+										€</span>
+								</p>
 							</div>
-						{% endif %}
-						<p class="text-gray-600 mt-2">
-							Prix Unitaire :
-							<span class="font-bold">{{ product.product.price }}
-								€</span>
-						</p>
-						<div class="mt-4 flex items-center space-x-4">
-							<a href="{{ path('cart_remove', { id: product.product.id }) }}">
-								<button class="bg-red-500 text-white font-bold px-3 py-3 rounded hover:bg-red-600 transition" aria-label="Diminuer la quantité">
-									-
-								</button>
-							</a>
-							<span class="text-lg font-bold text-gray-700">{{
-          product.quantity
-        }}</span>
-							<a href="{{ path('cart_add', { id: product.product.id }) }}">
-								<button class="bg-green-500 text-white font-bold px-3 py-3 rounded hover:bg-green-600 transition" aria-label="Augmenter la quantité">
-									+
-								</button>
-							</a>
+						</div>
 
-							<a href="{{ path('cart_allRemove', { id: product.product.id }) }}">
-								<button class="bg-red-500 text-white font-bold px-3 py-3 rounded hover:bg-red-600 transition" aria-label="Augmenter la quantité">
-									Tout Supprimer
-								</button>
+						<!-- Section Contrôles de quantité -->
+						<div class="flex items-center space-x-4">
+							<a href="{{ path('cart_remove', { id: product.product.id }) }}" class="text-2xl text-red-600 hover:text-red-800 transition transform hover:scale-110">
+								-
+							</a>
+							<span class="text-lg font-bold text-gray-800">{{ product.quantity }}</span>
+							<a href="{{ path('cart_add', { id: product.product.id }) }}" class="text-2xl text-green-600 hover:text-green-800 transition transform hover:scale-110">
+								+
 							</a>
 						</div>
-					</div>
+
+						<!-- Lien Supprimer le produit -->
+						<a href="{{ path('cart_allRemove', { id: product.product.id }) }}" class="text-sm text-red-600 hover:text-red-800 transition transform hover:scale-110">
+							Supprimer
+						</a>
+					</article>
 				{% endfor %}
-			</div>
-			<div class="mt-8 text-center">
-				<p class="text-2xl font-bold text-gray-800">
-					Total :
+			</section>
+
+			<!-- Section Total et validation -->
+			<section class="mt-8 text-center">
+				<p class="text-2xl font-semibold text-gray-800 mb-6">Total :
 					<span class="text-blue-600">{{ total }}
 						€</span>
 				</p>
-
-
-				<a href="{{path('validation_cart_address')}}" class="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 transition mx-auto block text-center">
-					<button>Choisissez votre adresse</button>
+				<a href="{{ path('validation_cart_address') }}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition transform hover:scale-105">
+					Choisir une adresse
 				</a>
-			</div>
+			</section>
 		{% endif %}
-	</div>
+	</main>
 {% endblock %}

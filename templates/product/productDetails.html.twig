@@ -2,61 +2,75 @@
 
 {% block title %}
 	{{ product.label }}
+	- Détails du produit
 {% endblock %}
 
 {% block body %}
-	<div class="container mx-auto mt-12 p-6 bg-gray-100 shadow-lg rounded-xl">
-		<div class="bg-white p-8 rounded-lg shadow-md">
-			<div class="mb-6">
-				<h1 class="text-4xl font-bold text-gray-800">{{ product.label }}</h1>
-				<p class="text-gray-500 mt-2">Référence :
-					<span class="font-medium">{{ product.ref }}</span>
-				</p>
-				<p class="text-gray-500">Fournisseur :
-					<span class="font-medium">{{ product.supplier.ref }}</span>
-				</p>
-				<p class="text-gray-500">Rubriques :
-					<span class="font-medium">{{ product.rubric.label }}</span>
-				</p>
+	<div class="container mx-auto p-6 bg-gradient-to-r from-blue-50 to-indigo-100 shadow-xl rounded-lg mt-16">
+		<div
+			class="bg-white p-8 rounded-lg shadow-lg">
+
+			<!-- Titre du produit et informations de base -->
+			<div class="flex justify-between items-center mb-8">
+				<div>
+					<h1 class="text-4xl font-extrabold text-gray-800">{{ product.label }}</h1>
+					<p class="text-gray-500 mt-2">Référence :
+						<span class="font-medium">{{ product.ref }}</span>
+					</p>
+					<p class="text-gray-500">Fournisseur :
+						<span class="font-medium">{{ product.supplier.ref }}</span>
+					</p>
+					<p class="text-gray-500">Rubrique :
+						<span class="font-medium">{{ product.rubric.label }}</span>
+					</p>
+				</div>
+
+				<!-- Prix -->
+				<div class="text-right">
+					<p class="text-2xl font-bold text-indigo-600">{{ product.price }}
+						€ HT</p>
+				</div>
 			</div>
 
-			{% for image in product.image %}
-				<div class="mb-6">
-					<img src="{{ image.img }}" alt="{{ product.label }}" class="w-full h-64 object-cover rounded-lg shadow-lg">
-				</div>
-			{% endfor %}
+			<!-- Images du produit -->
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+				{% for image in product.image %}
+					<div class="mb-4">
+						<img src="{{ image.img }}" alt="{{ product.label }}" class="w-full h-72 object-cover rounded-xl shadow-lg transition transform hover:scale-105 duration-300 ease-in-out"/>
+					</div>
+				{% endfor %}
+			</div>
 
+			<!-- Description du produit -->
 			<div class="mb-6">
 				<h2 class="text-2xl font-semibold text-gray-800 mb-3">Description</h2>
-				<p class="text-gray-600">{{ product.content }}</p>
+				<p class="text-gray-700 leading-relaxed">{{ product.content }}</p>
 			</div>
 
+			<!-- Poids Net -->
 			<div class="mb-6">
 				<h2 class="text-2xl font-semibold text-gray-800 mb-3">Poids Net</h2>
 				<p class="text-gray-600">{{ product.weight }}
 					Kg</p>
 			</div>
 
-			<div class="mb-6">
-				<h2 class="text-2xl font-semibold text-gray-800 mb-3">Prix</h2>
-				<p class="text-lg font-bold text-gray-800">{{ product.price }}
-					€ HT</p>
-			</div>
-
+			<!-- Informations supplémentaires (admin only) -->
 			{% if is_granted('ROLE_ADMIN') %}
 				<div class="mb-6">
 					<h2 class="text-2xl font-semibold text-gray-800 mb-3">Autres Informations</h2>
 					<ul class="list-disc list-inside text-gray-600">
-						<li>Stock :
+						<li>Stock disponible :
 							{{ product.stock }}</li>
-
 					</ul>
 				</div>
 			{% endif %}
-			<a href="{{path('cart_add', {'id': product.id})}}" class=" px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-				Ajouter au panier
-			</a>
 
+			<!-- Ajouter au panier -->
+			<div class="mt-8 flex justify-center">
+				<a href="{{ path('cart_add', {'id': product.id}) }}" class="px-8 py-3 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 focus:outline-none focus:ring-4 focus:ring-yellow-300 transition duration-200 transform hover:scale-105">
+					Ajouter au panier
+				</a>
+			</div>
 		</div>
 	</div>
 {% endblock %}

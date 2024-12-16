@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 #[Route('/rubric', name: 'rubric_')]
 class RubricController extends AbstractController
@@ -19,7 +20,7 @@ class RubricController extends AbstractController
             $viewRubrics = $entityManager->getRepository(Rubric::class)->findBy(['parent' => null]);
         } catch (\Exception $e) {
             $this->addFlash('error', 'Impossible de charger les rubriques Veuillez réessayer plus tard');
-            return $this->redirectToRoute('app_index');
+            return $this->redirectToRoute('VillageGreen_index');
         }
 
         return $this->render('rubric/rubrics.html.twig', ['rubrics' => $viewRubrics]);

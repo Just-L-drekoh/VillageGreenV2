@@ -4,8 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Order;
 use App\Entity\Product;
-
-use App\Form\OrderType;
 use App\Entity\OrderDetails;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,9 +16,33 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/cart', name: 'cart_')]
 class CartController extends AbstractController
 {
+    /**
+     * Calcule les détails du produit pour le panier, y compris les taxes
+     */
+    private function calculateProductDetails(Product $product, int $quantity): array
+    {
 
+        $tax = $product->getTax();
+        $taxRate = $tax ? $tax->getRate() : 0;
+
+        $priceWithTax = $product->getPrice() * (1 + $taxRate / 100);
+
+        $total = $priceWithTax * $quantity;
+
+        $totalTaxes = ($priceWithTax - $product->getPrice()) * $quantity;
+
+        return [
+            'priceWithTax' => $priceWithTax,
+            'total' => $total,
+            'totalTaxes' => $totalTaxes
+        ];
+    }
+
+    /**
+     * Affiche le contenu du panier
+     */
     #[Route('/', name: 'index')]
-    public function viewCart(ProductRepository $productRepository, SessionInterface $session, Request $request): Response
+    public function viewCart(ProductRepository $productRepository, SessionInterface $session): Response
     {
         $user = $this->getUser();
 
@@ -34,8 +56,6 @@ class CartController extends AbstractController
         $total = 0;
         $totalTaxes = 0;
 
-
-
         foreach ($panier as $id => $quantity) {
             $product = $productRepository->find($id);
 
@@ -43,21 +63,23 @@ class CartController extends AbstractController
                 continue;
             }
 
-            $tax = $product->getTax();
-            $taxRate = $tax->getRate();
+            // Calcul des détails du produit, incluant les taxes
+            $productDetails = $this->calculateProductDetails($product, $quantity);
 
-            $priceWithTax = $product->getPrice() * (1 + $taxRate / 100);
-            $total += $priceWithTax * $quantity;
-            $totalTaxes += ($priceWithTax - $product->getPrice()) * $quantity;
-            $session->set('ttc', $total);
+            // Ajout des totaux
+            $total += $productDetails['total'];
+            $totalTaxes += $productDetails['totalTaxes'];
 
             $dataProduct[] = [
                 'product' => $product,
                 'quantity' => $quantity,
-                'priceWithTax' => $priceWithTax,
+                'priceWithTax' => $productDetails['priceWithTax'],
             ];
         }
-        dump($session);
+
+        // Sauvegarde du total TTC dans la session
+        $session->set('ttc', $total);
+
         return $this->render('cart/index.html.twig', [
             'products' => $dataProduct,
             'total' => $total,
@@ -65,31 +87,35 @@ class CartController extends AbstractController
         ]);
     }
 
-
+    /**
+     * Ajoute un produit au panier
+     */
     #[Route('/add/{id}', name: 'add')]
-    public function add(Product $product, SessionInterface $session): Response
+    public function add(?Product $product, SessionInterface $session): Response
     {
+        if ($product === null) {
+            $this->addFlash('error', 'Produit non trouvé');
+            return $this->redirectToRoute('cart_index');
+        }
+
         $id = $product->getId();
         $panier = $session->get('panier', []);
 
-        if (!empty($panier[$product->getId()])) {
-            $panier[$id]++;
-        } else {
-            $panier[$id] = 1;
-        }
+        $panier[$id] = ($panier[$id] ?? 0) + 1;
 
         $session->set('panier', $panier);
 
         return $this->redirectToRoute('cart_index');
     }
 
+    /**
+     * Supprime completement un produit du panier
+     */
     #[Route('/allRemove/{id}', name: 'allRemove')]
     public function allRemove(Product $product, SessionInterface $session): Response
     {
         $id = $product->getId();
-
         $panier = $session->get('panier', []);
-
 
         unset($panier[$id]);
 
@@ -98,12 +124,13 @@ class CartController extends AbstractController
         return $this->redirectToRoute('cart_index');
     }
 
-
+    /**
+     * Retire une unité d'un produit du panier
+     */
     #[Route('/remove/{id}', name: 'remove')]
     public function remove(Product $product, SessionInterface $session): Response
     {
         $id = $product->getId();
-
         $panier = $session->get('panier', []);
 
         if (!empty($panier[$id])) {
@@ -119,8 +146,11 @@ class CartController extends AbstractController
         return $this->redirectToRoute('cart_index');
     }
 
+    /**
+     * Passe la commande
+     */
     #[Route('/order', name: 'order')]
-    public function order(SessionInterface $session, EntityManagerInterface $entityManager, Request $request): Response
+    public function order(SessionInterface $session, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
 
@@ -138,10 +168,15 @@ class CartController extends AbstractController
 
         $paiement = $session->get('paiement');
 
+        if (empty($paiement)) {
+            $this->addFlash('warning', 'Aucun moyen de paiement sélectionné');
+            return $this->redirectToRoute('cart_index');
+        }
+
         // Création d'une nouvelle commande
         $order = new Order();
         $order->setUser($user);
-        $order->setRef('Com:' . mt_rand(100000, 999999));
+        $order->setRef('Com:' . uniqid() . mt_rand(100, 999));
         $order->setPaymentMethod($paiement);
         $order->setType('commande');
         $order->setPaymentDate(new \DateTimeImmutable());
@@ -156,21 +191,19 @@ class CartController extends AbstractController
             $product = $entityManager->getRepository(Product::class)->find($id);
 
             if (!$product) {
-                $this->addFlash('warning', "Le produit avec l'ID $id n'existe pas et a été ignoré.");
+                $this->addFlash('warning', "Le produit avec le titre ($id) n'existe pas et a été ignoré.");
                 continue;
             }
 
-            $tax = $product->getTax();
-            $taxRate = $tax ? $tax->getRate() : 0;
-
-            $priceWithTax = $product->getPrice() * (1 + $taxRate / 100);
-            $totalAmount += $priceWithTax * $quantity;
+            // Calcul des détails du produit, incluant les taxes
+            $productDetails = $this->calculateProductDetails($product, $quantity);
+            $totalAmount += $productDetails['total'];
 
             $orderDetail = new OrderDetails();
             $orderDetail->setOrder($order);
             $orderDetail->setProduct($product);
             $orderDetail->setQuantity($quantity);
-            $orderDetail->setPrice($priceWithTax);
+            $orderDetail->setPrice($productDetails['priceWithTax']);  // Assurez-vous que le prix avec taxes est stocké
 
             $orderDetails[] = $orderDetail;
         }
@@ -179,8 +212,6 @@ class CartController extends AbstractController
             $this->addFlash('warning', "Aucun produit valide dans votre panier.");
             return $this->redirectToRoute('cart_index');
         }
-
-        $order->setTotal($totalAmount);
 
         $entityManager->persist($order);
         foreach ($orderDetails as $orderDetail) {
@@ -195,10 +226,14 @@ class CartController extends AbstractController
         return $this->redirectToRoute('profile_index');
     }
 
+    /**
+     * Récapitulatif du panier
+     */
     #[Route('/recap', name: 'recap')]
     public function recap(ProductRepository $productRepository, SessionInterface $session): Response
     {
         $user = $this->getUser();
+        $address = $session->get('address');
 
         if (!$user) {
             $this->addFlash('warning', 'Vous devez vous connecter pour voir votre récapitulatif.');
@@ -206,26 +241,20 @@ class CartController extends AbstractController
         }
 
         $panier = $session->get('panier', []);
-        $dataProduct = [];
-
-        foreach ($panier as $id => $quantity) {
+        $dataProduct = array_filter(array_map(function ($id) use ($productRepository, $panier) {
             $product = $productRepository->find($id);
 
-            if ($product) {
-                $dataProduct[] = [
-                    'product' => $product,
-                    'quantity' => $quantity,
-                    'label' => $product->getLabel(),
-                ];
-            }
-        }
+            return $product ? [
+                'product' => $product,
+                'quantity' => $panier[$id],
+                'label' => $product->getLabel(),
+            ] : null;
+        }, array_keys($panier)));
 
         return $this->render('cart/recap.html.twig', [
             'recap' => [
-
                 'products' => $dataProduct,
-
-
+                'addresses' => $address
             ],
         ]);
     }

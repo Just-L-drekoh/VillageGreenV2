@@ -7,7 +7,7 @@
 {% block body %}
 	<!-- Conteneur principal -->
 	<div class="container mx-auto mt-12 p-6 bg-gray-100 shadow-lg rounded-xl">
-		<h1 class="text-4xl font-bold text-gray-800 text-center mb-6">
+		<h1 class="text-4xl font-bold text-gray-800 text-center mb-8">
 			Tous nos Instruments concernant :
 			{{ rubric.label }}
 		</h1>
@@ -16,45 +16,44 @@
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 			{% for product in products %}
 				<!-- Carte produit -->
-				<div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+				<div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+
 					{% if is_granted('ROLE_ADMIN') %}
 						<!-- Informations administratives -->
-						<p class="text-xs text-gray-500 uppercase tracking-wide">
-							Référence :
-							{{ product.ref }}
-						</p>
 						<p class="text-xs text-gray-500 uppercase tracking-wide mb-2">
+							Référence :
+							<span class="font-medium">{{ product.ref }}</span>
+						</p>
+						<p class="text-xs text-gray-500 uppercase tracking-wide mb-4">
 							Fournisseur :
-							{{ product.supplier.ref }}
+							<span class="font-medium">{{ product.supplier.ref }}</span>
 						</p>
 					{% endif %}
 
 					<!-- Titre du produit -->
-					<h2 class="text-xl font-semibold text-gray-800 mb-4">
-						{{ product.label }}
-					</h2>
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">{{ product.label }}</h2>
 
 					<!-- Image du produit -->
 					{% if product.image|length > 0 %}
 						<div class="overflow-hidden rounded-lg mb-4">
-							<img src="{{ product.image[0].img }}" alt="{{ product.label }}" class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300">
+							<img src="{{ product.image[0].img }}" alt="{{ product.label }}" class="w-full h-48 object-cover rounded-lg transition-transform duration-300 transform hover:scale-105">
 						</div>
 					{% endif %}
 
 					<!-- Description et prix -->
 					<p class="text-gray-600 mb-4">{{ product.content }}</p>
-					<p class="text-lg font-bold text-gray-800">
+					<p class="text-lg font-semibold text-gray-800 mb-4">
 						Prix :
-						{{ product.price }}
-						€
+						<span class="text-indigo-600">{{ product.price }}
+							€ HT</span>
 					</p>
 
 					<!-- Actions -->
-					<div class="mt-4 flex justify-between">
-						<a href="{{ path('product_details', {'slug': product.slug}) }}" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+					<div class="mt-4 flex justify-between gap-4">
+						<a href="{{ path('product_details', {'slug': product.slug}) }}" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
 							Voir l'instrument
 						</a>
-						<a href="{{ path('cart_add', {'id': product.id}) }}" class="px-4 py-2 bg-blue-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+						<a href="{{ path('cart_add', {'id': product.id}) }}" class="px-4 py-2 bg-blue-600 text-white font-semibold text-sm rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
 							Ajouter au panier
 						</a>
 					</div>
