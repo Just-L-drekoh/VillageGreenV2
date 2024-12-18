@@ -3,180 +3,146 @@
 {% endblock %}
 {% block body %}
 
-	<div class="container mx-auto mt-12 p-6 bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 shadow-lg rounded-xl">
-		<h1 class="text-4xl font-bold text-gray-800 text-center mb-6">
-			Heureux de vous revoir,
-			<span class="text-blue-600">{{ user.firstName }}</span>!
+	<div class="container mx-auto mt-12 p-8 bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 shadow-2xl rounded-xl">
+		<h1 class="text-5xl font-extrabold text-gray-900 text-center mb-6">
+			Bienvenue,
+			<span class="text-blue-700">{{ user.firstName }}</span>!
 		</h1>
-
-		<p class="text-lg font-medium text-gray-600 text-center mb-8">
-			Votre Référence :
-			<span class="font-bold text-gray-800">{{ user.ref }}</span>
+		<p class="text-lg font-semibold text-gray-700 text-center mb-4">
+			Référence utilisateur :
+			<span class="text-xl font-bold text-gray-900">{{ user.ref }}</span>
 		</p>
-
-
-		<p class="text-lg font-medium text-gray-600 text-center mb-8">
-			Vous etes un
-			<span class="font-bold text-gray-800">
-				{{user.siret ? 'professionel' : 'particulier'}}
+		<p class="text-lg text-gray-700 text-center">
+			Type de compte :
+			<span class="text-xl font-bold {{ user.siret ? 'text-green-600' : 'text-orange-600' }}">
+				{{ user.siret ? 'Professionnel' : 'Particulier' }}
 			</span>
 		</p>
 
-
 		{% if is_granted('ROLE_ADMIN') %}
-			{% if app.user.isVerified %}
-				<div class="bg-white p-4 rounded-lg shadow-md mb-8">
-					<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-						Tableau de bord
-					</p>
-					<a href="{{ path('admin_dashboard') }}" class="text-lg font-medium text-blue-600 hover:underline">
-						Cliquez ici pour accéder au tableau de bord
+			<div class="mt-8 bg-white p-6 rounded-lg shadow-lg text-center">
+				{% if user.isVerified %}
+					<p class="text-lg font-semibold text-gray-600 mb-2">Accès Administrateur</p>
+					<a href="{{ path('admin') }}" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition">
+						Accéder au tableau de bord
 					</a>
-				</div>
-			{% else %}
-				<div class="bg-white p-4 rounded-lg shadow-md mb-8">
-					<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-						Vous devez verifier votre compte pour acceder au tableau de bord
-					</p>
-				</div>
-			{% endif %}
-		{% endif %}
-
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-			<div class="bg-white p-6 rounded-lg shadow-md">
-				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">Prénom</p>
-				<p class="text-xl text-gray-800">{{ user.firstName }}</p>
+				{% else %}
+					<p class="text-lg text-red-600 font-semibold">Vous devez vérifier votre compte pour accéder au tableau de bord.</p>
+				{% endif %}
 			</div>
-
-			<div class="bg-white p-6 rounded-lg shadow-md">
-				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">Nom</p>
-				<p class="text-xl text-gray-800">{{ user.lastName }}</p>
-			</div>
-
-			<div class="bg-white p-6 rounded-lg shadow-md">
-				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-					Adresse Email
-				</p>
-				<p class="text-xl text-gray-800">{{ user.email }}</p>
-			</div>
-
-			{% if user.siret %}
-				<div class="bg-white p-6 rounded-lg shadow-md">
-					<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-						Votre Numero de SIRET
-					</p>
-					<p class="text-xl text-gray-800">N°{{ user.siret }}</p>
-				</div>
-			{% endif %}
-
-			<div class="bg-white p-6 rounded-lg shadow-md">
-				<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-					Numéro de Téléphone
-				</p>
-				<p class="text-xl text-gray-800">{{ user.Phone }}</p>
-			</div>
-
-			<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center">
-				<a href="{{ path('app_change_password', {'id': user.id}) }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
-					Changer mon mot de passe
-				</a>
-			</div>
-
-			<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center">
-				<a href="{{ path('profile_update', {'id': user.id}) }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
-					Modifier mon profil
-				</a>
-			</div>
-
-			<div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center">
-				<a href="{{ path('address_add') }}" class="text-sm font-semibold text-gray-500 hover:text-yellow-600 uppercase">
-					Ajouter une adresse
-				</a>
-			</div>
-
-
-		</div>
-
-		{% if not app.user.verified %}
-			<div class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
-				<p class="font-medium text-center">
-					Votre compte n'est pas encore activé. Cliquez sur le bouton ci-dessous
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																			      pour recevoir un nouvel e-mail d'activation.
-				</p>
-			</div>
-
-			<div class="mt-6 text-center">
-				<a href="{{ path('app_resend_email') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
-					Renvoyer l'e-mail de vérification
-				</a>
-			</div>
-		{% endif %}
-
-
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 mt-4">
-			{% for address in user.address %}
-				<div class="bg-white p-6 rounded-lg shadow-md">
-					<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-						Adresse
-						{{ loop.index }}
-					</p>
-					<p class="text-xl text-gray-800">
-						<span class="text-gray-500">{{ address.complement }}</span>
-						{{ address.Address }}
-						{{ address.Cp }}
-						{{ address.City }}
-
-					</p>
-					<p class="text-sm text-gray-600">{{ address.Type }}</p>
-
-					<a href="{{ path('address_update', {'id': address.id}) }}" class="text-blue-600 hover:underline px-4 py-2 rounded-md">Modifier</a>
-					<a href="{{ path('address_delete', {'id': address.id}) }}" class="text-red-600 hover:underline px-4 py-2 rounded-md">Supprimer</a>
-
-				</div>
-			{% endfor %}
-		</div>
-	</p>
-</div>
-<div class="container mx-auto mt-12 p-6 bg-gradient-to-r from-blue-100 via-red-100 to-green-100 shadow-lg rounded-xl">
-	<h1 class="text-4xl font-bold text-gray-800 text-center mb-6">Vos Commandes</h1>
-	<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-		{% if user.orders is none or user.orders|length == 0 %}
-			<p class="text-lg font-medium text-gray-600 text-center mb-8">
-				Vous n'avez pas encore de commande
-			</p>
-		{% else %}
-			{% for order in user.orders %}
-				<div class="bg-white p-6 rounded-lg shadow-md mb-4">
-					<p class="text-sm font-semibold text-gray-500 uppercase mb-2">
-						Commande
-						{{ loop.index }}:
-
-					</p>
-					<p class="text-xl text-gray-800">
-						<span class="text-gray-500">N°</span>
-						{{ order.id }}
-					</p>
-
-
-					<div class="mt-4">
-						<p class="text-gray-600">
-							<strong>Date:
-							</strong>
-
-						</p>
-						<p class="text-gray-600">
-							<strong>Status:
-							</strong>
-							{{ order.status }}
-						</p>
-						<p class="text-gray-600">
-							<strong>Total:
-							</strong>${{ order.total }}
-						</p>
-					</div>
-				</div>
-			{% endfor %}
-
 		{% endif %}
 	</div>
-</div>{% endblock %}
+
+	<div class="container mx-auto mt-12 p-8 bg-white shadow-xl rounded-xl">
+		<h2 class="text-4xl font-bold text-gray-800 text-center mb-6">Vos Informations</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+			<div class="bg-gray-100 p-6 rounded-lg shadow-md">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-1">Prénom</p>
+				<p class="text-2xl font-bold text-gray-800">{{ user.firstName }}</p>
+			</div>
+			<div class="bg-gray-100 p-6 rounded-lg shadow-md">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-1">Nom</p>
+				<p class="text-2xl font-bold text-gray-800">{{ user.lastName }}</p>
+			</div>
+			<div class="bg-gray-100 p-6 rounded-lg shadow-md">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-1">Email</p>
+				<p class="text-2xl font-bold text-gray-800">{{ user.email }}</p>
+			</div>
+			{% if user.siret %}
+				<div class="bg-gray-100 p-6 rounded-lg shadow-md">
+					<p class="text-sm font-semibold text-gray-500 uppercase mb-1">Numéro SIRET</p>
+					<p class="text-2xl font-bold text-gray-800">{{ user.siret }}</p>
+				</div>
+			{% endif %}
+			<div class="bg-gray-100 p-6 rounded-lg shadow-md">
+				<p class="text-sm font-semibold text-gray-500 uppercase mb-1">Téléphone</p>
+				<p class="text-2xl font-bold text-gray-800">{{ user.phone }}</p>
+			</div>
+		</div>
+
+		<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+			<a href="{{ path('app_change_password', {'id': user.id}) }}" class="text-lg font-semibold text-blue-600 hover:text-yellow-600">
+				Changer mon mot de passe
+			</a>
+			<a href="{{ path('profile_update', {'id': user.id}) }}" class="text-lg font-semibold text-blue-600 hover:text-yellow-600">
+				Modifier mon profil
+			</a>
+			<a href="{{ path('address_add') }}" class="text-lg font-semibold text-blue-600 hover:text-yellow-600">
+				Ajouter une adresse
+			</a>
+		</div>
+	</div>
+
+	{% if not app.user.verified %}
+		<div class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
+			<p class="font-medium text-center">
+				Votre compte n'est pas encore activé. Cliquez sur le bouton ci-dessous
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																							      pour recevoir un nouvel e-mail d'activation.
+			</p>
+		</div>
+
+		<div class="mt-6 text-center">
+			<a href="{{ path('app_resend_email') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+				Renvoyer l'e-mail de vérification
+			</a>
+		</div>
+	{% endif %}
+	<div class="container mx-auto mt-12 p-8 bg-gradient-to-r from-green-100 via-yellow-100 to-green-300 shadow-xl rounded-xl">
+		<h2 class="text-4xl font-bold text-gray-800 text-center mb-6">Vos Adresses</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+			{% if user.address|length == 0 %}
+				<p class="text-xl font-semibold text-gray-600 text-center">
+					Vous n'avez pas encore d'adresses enregistrées.
+				</p>
+			{% else %}
+				{% for address in user.address %}
+					<div class="bg-white p-6 rounded-lg shadow-lg">
+						<p class="text-lg font-bold text-gray-800">Adresse
+							{{ loop.index }}</p>
+						<p class="text-gray-600">{{ address.address }},
+							{{ address.city }}
+							{{ address.cp }}</p>
+						<p class="text-sm text-gray-500">{{ address.complement }}</p>
+						<div class="mt-4">
+							<a href="{{ path('address_update', {'id': address.id}) }}" class="text-blue-600 hover:underline mr-4">
+								Modifier
+							</a>
+							<a href="{{ path('address_delete', {'id': address.id}) }}" class="text-red-600 hover:underline">
+								Supprimer
+							</a>
+						</div>
+					</div>
+				{% endfor %}
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="container mx-auto mt-12 p-8 bg-gradient-to-r from-yellow-100 via-red-100 to-orange-200 shadow-xl rounded-xl">
+		<h2 class="text-4xl font-bold text-gray-800 text-center mb-6">Vos Commandes</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+			{% if user.orders|length == 0 %}
+				<p class="text-xl font-semibold text-gray-600 text-center">
+					Vous n'avez pas encore passé de commandes.
+				</p>
+			{% else %}
+				{% for order in user.orders %}
+					<div class="bg-white p-6 rounded-lg shadow-lg">
+						<p class="text-lg font-bold text-gray-800">Commande
+							{{ loop.index }}</p>
+						<p class="text-gray-600">Numéro :
+							{{ order.id }}</p>
+						<p class="text-gray-600">Date :
+							{{ order.date|date('d/m/Y') }}</p>
+						<p class="text-gray-600">Statut :
+							<span class="font-semibold">{{ order.status }}</span>
+						</p>
+						<p class="text-gray-600">Total :
+							{{ order.total|number_format(2, ',', ' ') }}
+							€</p>
+					</div>
+				{% endfor %}
+			{% endif %}
+		</div>
+	</div>
+
+{% endblock %}

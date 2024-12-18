@@ -7,87 +7,20 @@ use App\Form\AddressFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/address', name: 'address_')]
 class AddressController extends AbstractController
 {
-    #[Route('/add', name: 'add')]
-    public function addAddress(Request $request, EntityManagerInterface $entityManager): Response
+    private function checkUser(): Response|null
     {
         $user = $this->getUser();
-
         if (!$user) {
+            $this->addFlash('warning', 'Vous devez être connecté pour gérer vos adresses.');
             return $this->redirectToRoute('app_login');
         }
-
-        $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
-        $availableTypes = $this->getAvailableTypes($existingAddresses);
-
-        if (empty($availableTypes)) {
-            $this->addFlash('warning', 'Vous avez déjà une adresse de livraison et une adresse de facturation.');
-            return $this->redirectToRoute('profile_index');
-        }
-
-        $address = new Address();
-        $address->setUser($user)
-            ->setDefault(true);
-
-        $form = $this->createForm(AddressFormType::class, $address, [
-            'available_types' => $availableTypes,
-            'csrf_protection' => true,
-        ]);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($address);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Adresse ajoutée avec succès.');
-            return $this->redirectToRoute('profile_index');
-        }
-
-        return $this->render('address/addAddress.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route('/update/{id}', name: 'update')]
-    public function updateAddress(Request $request, Address $address, EntityManagerInterface $entityManager): Response
-    {
-        $user = $this->getUser();
-
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        if ($address->getUser() !== $user) {
-            return $this->redirectToRoute('app_profile');
-        }
-
-        $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
-        $usedTypes = array_map(fn($addr) => $addr->getType(), $existingAddresses);
-
-        $availableTypes = $this->getAvailableTypes($existingAddresses, $address->getType());
-
-        $form = $this->createForm(AddressFormType::class, $address, [
-            'available_types' => $availableTypes,
-            'csrf_protection' => true,
-        ]);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($address);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Adresse mise à jour avec succès.');
-            return $this->redirectToRoute('profile_index');
-        }
-
-        return $this->render('address/updateAddress.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        return null;
     }
 
     private function getAvailableTypes(array $existingAddresses, string $currentType = null): array
@@ -95,22 +28,120 @@ class AddressController extends AbstractController
         $types = ['Livraison', 'Facturation'];
         $usedTypes = array_map(fn($address) => $address->getType(), $existingAddresses);
 
-        if ($currentType && !in_array($currentType, $usedTypes)) {
-            $usedTypes[] = $currentType;
+        if ($currentType) {
+            $usedTypes = array_diff($usedTypes, [$currentType]);
         }
 
         $availableTypes = array_diff($types, $usedTypes);
 
+        if ($currentType) {
+            $availableTypes[] = $currentType;
+        }
+
         return array_combine($availableTypes, $availableTypes);
+    }
+
+    #[Route('/add', name: 'add')]
+    public function addAddress(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        try {
+            if ($response = $this->checkUser()) {
+                return $response;
+            }
+
+            $user = $this->getUser();
+            $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
+            $availableTypes = $this->getAvailableTypes($existingAddresses);
+
+            if (empty($availableTypes)) {
+                $this->addFlash('warning', 'Vous avez déjà une adresse de livraison et une adresse de facturation. (Modifiez ou supprimez une adresse pour en ajouter une nouvelle.)');
+                return $this->redirectToRoute('profile_index');
+            }
+
+            $address = (new Address())->setUser($user)->setDefault(true);
+
+            $form = $this->createForm(AddressFormType::class, $address, [
+                'available_types' => $availableTypes,
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($address);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Adresse ajoutée avec succès.');
+                return $this->redirectToRoute('profile_index');
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de l\'ajout de l\'adresse.');
+            return $this->redirectToRoute('profile_index');
+        }
+        return $this->render('address/add_address.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/update/{id}', name: 'update')]
+    public function updateAddress(Request $request, Address $address, EntityManagerInterface $entityManager): Response
+    {
+        try {
+            if ($response = $this->checkUser()) {
+                return $response;
+            }
+
+            $user = $this->getUser();
+            if ($address->getUser() !== $user) {
+                $this->addFlash('error', 'Vous n\'avez pas la permission de modifier cette adresse.');
+                return $this->redirectToRoute('profile_index');
+            }
+
+            $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
+            $availableTypes = $this->getAvailableTypes($existingAddresses, $address->getType());
+
+            $form = $this->createForm(AddressFormType::class, $address, [
+                'available_types' => $availableTypes,
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($address);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Adresse mise à jour avec succès.');
+                return $this->redirectToRoute('profile_index');
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'adresse.');
+            return $this->redirectToRoute('profile_index');
+        }
+
+        return $this->render('address/update_address.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     #[Route('/delete/{id}', name: 'delete')]
     public function deleteAddress(Address $address, EntityManagerInterface $entityManager): Response
     {
-        $entityManager->remove($address);
-        $entityManager->flush();
+        try {
+            if ($response = $this->checkUser()) {
+                return $response;
+            }
 
+            $user = $this->getUser();
+            if ($address->getUser() !== $user) {
+                $this->addFlash('error', 'Vous n\'avez pas la permission de supprimer cette adresse.');
+                return $this->redirectToRoute('profile_index');
+            }
 
-        return $this->redirectToRoute('profile_index');
+            $entityManager->remove($address);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Adresse supprimée avec succès.');
+            return $this->redirectToRoute('profile_index');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de la suppression de l\'adresse.');
+            return $this->redirectToRoute('profile_index');
+        }
     }
 }

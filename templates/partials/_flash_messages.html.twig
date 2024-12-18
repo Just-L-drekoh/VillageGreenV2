@@ -1,0 +1,14 @@
+{% for label, messages in app.flashes %}
+	{% for message in messages %}
+		<div class="text-center py-2">
+			<div class="p-4 rounded-lg flex items-center justify-between text-white {% if label == 'success' %} bg-green-500 {% elseif label == 'error' %} bg-red-500 {% elseif label == 'info' %} bg-blue-500 {% elseif label == 'warning' %} bg-yellow-500 {% endif %}" role="alert">
+				<span class="font-semibold text-sm">
+					{{ message | raw }}
+				</span>
+				<button class="ml-4 bg-transparent hover:text-black focus:outline-none" onclick="this.parentElement.remove()">
+					&times;
+				</button>
+			</div>
+		</div>
+	{% endfor %}
+{% endfor %}

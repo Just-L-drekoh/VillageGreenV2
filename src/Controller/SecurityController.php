@@ -7,22 +7,22 @@ use App\Form\ChangePasswordType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Security;
 
 class SecurityController extends AbstractController
 {
+
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
 
-        // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('security/login.html.twig', [
@@ -31,6 +31,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
+
     #[Route('/logout', name: 'app_logout')]
     public function logout(SessionInterface $session): void
     {
@@ -38,6 +39,15 @@ class SecurityController extends AbstractController
 
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
+
+    /** 
+     * @param Request 
+     * @param UserPasswordHasherInterface 
+     * @param EntityManagerInterface 
+     * @param int 
+     * 
+     * @return Response
+     */
     #[Route('/change-password/{id}', name: 'app_change_password')]
     public function changePassword(
         Request $request,
@@ -45,15 +55,13 @@ class SecurityController extends AbstractController
         EntityManagerInterface $entityManager,
         int $id
     ): Response {
-        $userRepository = $entityManager->getRepository(User::class);
-        $user = $userRepository->find($id);
+        $user = $entityManager->getRepository(User::class)->find($id);
 
         if (!$user) {
             $this->addFlash('error', 'Utilisateur introuvable.');
             return $this->redirectToRoute('app_login');
         }
 
-        // Create the form
         $form = $this->createForm(ChangePasswordType::class);
         $form->handleRequest($request);
 
@@ -85,7 +93,7 @@ class SecurityController extends AbstractController
             }
         }
 
-        return $this->render('security/changePassword.html.twig', [
+        return $this->render('security/change_password.html.twig', [
             'form' => $form->createView(),
         ]);
     }

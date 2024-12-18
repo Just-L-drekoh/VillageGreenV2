@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier votre Profil
+{% endblock %}
+
+{% block body %}
+	<div class="container mx-auto mt-12 p-6 rounded-lg flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100">
+		<div class="bg-white shadow-xl rounded-lg p-8 w-full max-w-lg">
+			<h1 class="text-4xl font-extrabold text-gray-800 mb-6 text-center">Modifier votre Profil</h1>
+			<p class="text-gray-600 text-center mb-8">
+				<span class="text-blue-500 font-medium">Mettez à jour</span>
+				vos informations personnelles facilement en remplissant les champs ci-dessous.
+			</p>
+
+			<div>
+				{{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+
+				<!-- Email -->
+				<div>
+					<label for="{{ form.email.vars.id }}" class="block text-sm font-medium text-gray-700">Adresse Email</label>
+					<p class="text-sm text-gray-500 mb-2">Assurez-vous que votre email est correct pour recevoir les notifications.</p>
+					{{ form_row(form.email, {'attr': {'class': 'form-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'}}) }}
+				</div>
+
+				<!-- Prénom -->
+				<div>
+					<label for="{{ form.firstName.vars.id }}" class="block text-sm font-medium text-gray-700">Prénom</label>
+					<p class="text-sm text-gray-500 mb-2">Votre prénom tel qu'il apparaîtra sur votre profil.</p>
+					{{ form_row(form.firstName, {'attr': {'class': 'form-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'}}) }}
+				</div>
+
+				<!-- Nom -->
+				<div>
+					<label for="{{ form.lastName.vars.id }}" class="block text-sm font-medium text-gray-700">Nom</label>
+					<p class="text-sm text-gray-500 mb-2">Votre nom de famille pour une identification correcte.</p>
+					{{ form_row(form.lastName, {'attr': {'class': 'form-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'}}) }}
+				</div>
+
+				<!-- Téléphone -->
+				<div>
+					<label for="{{ form.phone.vars.id }}" class="block text-sm font-medium text-gray-700">Numéro de Téléphone</label>
+					<p class="text-sm text-gray-500 mb-2">Un numéro valide pour vous contacter rapidement.</p>
+					{{ form_row(form.phone, {'attr': {'class': 'form-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none'}}) }}
+				</div>
+
+				<!-- Bouton Enregistrer -->
+				<div class="mt-8">
+					<button type="submit" class="w-full bg-blue-500 text-white font-medium py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 focus:outline-none">
+						<i class="fas fa-save mr-2"></i>
+						Enregistrer les Modifications
+					</button>
+				</div>
+
+				{{ form_end(form) }}
+			</div>
+		</div>
+	</div>
+{% endblock %}

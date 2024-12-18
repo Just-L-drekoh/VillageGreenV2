@@ -11,52 +11,44 @@
 				<p class="text-sm text-gray-600">Remplissez votre adresse de livraison ou de facturation.</p>
 			</header>
 
-			<!-- Formulaire -->
 			{{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
-			<!-- Type d'Adresse -->
 			<section>
 				<label for="{{ form.type.vars.id }}" class="block text-sm font-medium text-gray-700">Type d'Adresse</label>
 				{{ form_widget(form.type, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}}) }}
 				<div class="text-sm text-red-500 mt-1">{{ form_errors(form.type) }}</div>
 			</section>
 
-			<!-- Ville -->
 			<section>
 				<label for="{{ form.city.vars.id }}" class="block text-sm font-medium text-gray-700">Ville</label>
 				{{ form_widget(form.city, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}}) }}
 				<div class="text-sm text-red-500 mt-1">{{ form_errors(form.city) }}</div>
 			</section>
 
-			<!-- Adresse -->
 			<section>
 				<label for="{{ form.address.vars.id }}" class="block text-sm font-medium text-gray-700">Adresse</label>
 				{{ form_widget(form.address, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}}) }}
 				<div class="text-sm text-red-500 mt-1">{{ form_errors(form.address) }}</div>
 			</section>
 
-			<!-- Code Postal -->
 			<section>
 				<label for="{{ form.cp.vars.id }}" class="block text-sm font-medium text-gray-700">Code Postal</label>
 				{{ form_widget(form.cp, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}}) }}
 				<div class="text-sm text-red-500 mt-1">{{ form_errors(form.cp) }}</div>
 			</section>
 
-			<!-- Adresse par défaut -->
 			<section class="flex items-center">
 				{{ form_widget(form.isDefault, {'attr': {'class': 'h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500'}}) }}
 				<label for="{{ form.isDefault.vars.id }}" class="ml-2 text-sm text-gray-700">Adresse par défaut</label>
 				<div class="text-sm text-red-500 mt-1">{{ form_errors(form.isDefault) }}</div>
 			</section>
 
-			<!-- Complément d'Adresse -->
 			<section>
 				<label for="{{ form.complement.vars.id }}" class="block text-sm font-medium text-gray-700">Complément d'Adresse (Optionnel)</label>
 				{{ form_widget(form.complement, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'}}) }}
 				<div class="text-sm text-red-500 mt-1">{{ form_errors(form.complement) }}</div>
 			</section>
 
-			<!-- Bouton de soumission -->
 			<section>
 				<button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
 					Enregistrer

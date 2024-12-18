@@ -11,110 +11,102 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class RegistrationController extends AbstractController
 {
+
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
         Security $security,
         EntityManagerInterface $entityManager,
-        JWTService $jwt,
-        SendEmailService $mail
+        JWTService $jwtService,
+        SendEmailService $sendEmailService
     ): Response {
 
-        $ref = mt_rand(10000, 99999);
-        $userRepository = $entityManager->getRepository(User::class);
-        $existingUser = $userRepository->findOneBy(['ref' => $ref]);
+        try {
+            $ref = $this->generateUniqueReference($entityManager);
 
-        if ($existingUser !== null) {
+            $user = new User();
+            $form = $this->createForm(RegistrationFormType::class, $user);
+            $form->handleRequest($request);
 
-            $ref = mt_rand(10000, 99999);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $plainPassword = $form->get('plainPassword')->getData();
+                $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+                $user->setRoles(['ROLE_USER']);
+                $user->setVerified(false);
+                $user->setRef("Cli:{$ref}");
+                $user->setLastConnect(new \DateTimeImmutable());
 
-            $this->addFlash('error', 'Un utilisateur avec le même ref existe déjà');
-            return $this->redirectToRoute('app_register');
+                $entityManager->persist($user);
+                $entityManager->flush();
+
+                $token = $this->generateJWT($jwtService, $user);
+
+                $sendEmailService->send(
+                    'no-reply@Village-green.fr',
+                    $user->getEmail(),
+                    'Activation de votre compte sur le Site Village_Green',
+                    'register',
+                    ['user' => $user, 'token' => $token]
+                );
+
+                $this->addFlash('success', 'Vous avez reçu un email pour activer votre compte');
+
+                return $security->login($user, 'form_login', 'main');
+            }
+
+            return $this->render('security/register.html.twig', [
+                'registrationForm' => $form->createView(),
+            ]);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur s\'est produite lors de la création de votre compte.');
+            return $this->redirectToRoute('villageGreen_index');
         }
-        $user = new User();
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var string $plainPassword */
-            $plainPassword = $form->get('plainPassword')->getData();
-            // encode the plain password
-            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
-            $user->setRoles(['ROLE_USER']);
-            $user->setVerified(false);
-            $user->setRef("Cli:{$ref}");
-            $user->setLastConnect(new \DateTimeImmutable());
-            $entityManager->persist($user);
-            $entityManager->flush();
-
-            $header = [
-                'alg' => 'HS256',
-                'typ' => 'JWT'
-            ];
-            $payload = [
-                'id' => $user->getId(),
-            ];
-
-            $token = $jwt->generate($header, $payload, $this->getParameter('app.jwt_secret'));
-
-            $mail->send(
-                'no-reply@Village-green.fr',
-                $user->getEmail(),
-                'Activation de votre compte sur le Site Village_Green',
-                'register',
-                compact('user', 'token') //['user => $user, 'token' => $token]
-            );
-            $this->addFlash('success', 'Vous avez reçu un email pour activer votre compte');
-
-            return $security->login($user, 'form_login', 'main');
-        }
-
-        return $this->render('security/register.html.twig', [
-            'registrationForm' => $form,
-        ]);
     }
+
+
     #[Route('/verify-email/{token}', name: 'app_verify_email')]
-    public function VerificationUserEmail(
-        $token,
-        JWTService $jwt,
+    public function verifyEmail(
+        string $token,
+        JWTService $jwtService,
         UserRepository $userRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        //on verifie que le token est correct(correctement formé, pas expiré)
-
-        if ($jwt->isValid($token) && !$jwt->isExpired($token) && $jwt->check($token, $this->getParameter('app.jwt_secret'))) {
-
-            $payload = $jwt->getPayload($token);
-
-            //On cherche le user qui correspond au payload
+        if ($jwtService->isValid($token) && !$jwtService->isExpired($token) && $jwtService->check($token, $this->getParameter('app.jwt_secret'))) {
+            $payload = $jwtService->getPayload($token);
 
             $user = $userRepository->find($payload['id']);
 
             if ($user && !$user->isVerified()) {
-
                 $user->setVerified(true);
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Votre compte est maintenant activé');
                 return $this->redirectToRoute('VillageGreen_index');
             }
+
             $this->addFlash('error', 'Le token est incorrect ou expiré');
-            return $this->redirectToRoute('app_register');
+        } else {
+            $this->addFlash('error', 'Le token est invalide ou a expiré');
         }
+
+        return $this->redirectToRoute('app_register');
     }
 
+
     #[Route('/resend-email', name: 'app_resend_email')]
-    public function resendVerificationUserEmail(
-        JWTService $jwt,
-        SendEmailService $mail,
-        EntityManagerInterface $entityManager
+    public function resendVerificationEmail(
+        JWTService $jwtService,
+        SendEmailService $sendEmailService,
+
     ): Response {
         $user = $this->getUser();
 
@@ -125,24 +117,40 @@ class RegistrationController extends AbstractController
 
         if ($user->isVerified()) {
             $this->addFlash('info', "Votre compte est déjà activé.");
-            return $this->redirectToRoute('app_profile');
+            return $this->redirectToRoute('profile_index');
         }
 
-        // Génération d'un nouveau token
-        $header = ['typ' => 'JWT', 'alg' => 'HS256'];
-        $payload = ['id' => $user->getId()];
-        $token = $jwt->generate($header, $payload, $this->getParameter('app.jwt_secret'));
+        $token = $this->generateJWT($jwtService, $user);
 
-        // Envoi de l'e-mail
-        $mail->send(
+        $sendEmailService->send(
             'no-reply@Village-green.fr',
             $user->getEmail(),
             'Réactivation de votre compte sur le site Village_Green',
             'register',
-            compact('user', 'token')
+            ['user' => $user, 'token' => $token]
         );
 
         $this->addFlash('success', "Un nouvel e-mail de vérification a été envoyé.");
-        return $this->redirectToRoute('app_profile');
+        return $this->redirectToRoute('profile_index');
+    }
+
+
+    private function generateUniqueReference(EntityManagerInterface $entityManager): string
+    {
+        do {
+            $ref = mt_rand(10000, 99999);
+            $existingUser = $entityManager->getRepository(User::class)->findOneBy(['ref' => $ref]);
+        } while ($existingUser !== null);
+
+        return $ref;
+    }
+
+
+    private function generateJWT(JWTService $jwtService, User $user): string
+    {
+        $header = ['alg' => 'HS256', 'typ' => 'JWT'];
+        $payload = ['id' => $user->getId()];
+
+        return $jwtService->generate($header, $payload, $this->getParameter('app.jwt_secret'));
     }
 }

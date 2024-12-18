@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Votre commande Village Green</title>
+	</head>
+	<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+		<h2 style="color: #006400;">Merci pour votre commande sur Village Green !</h2>
+
+		<p>Bonjour
+			<strong>{{ order.user.firstName }}</strong>,</p>
+		<p>Nous vous confirmons que votre commande a bien été enregistrée. Voici le récapitulatif :</p>
+
+		<!-- Informations de la commande -->
+		<h3>Informations de la commande</h3>
+		<ul>
+			<li>
+				<strong>Référence :</strong>
+				{{ order.ref }}</li>
+			<li>
+				<strong>Date :</strong>
+				{{ order.date|date('d/m/Y H:i') }}</li>
+			<li>
+				<strong>Méthode de paiement :</strong>
+				{{ order.paymentMethod }}</li>
+			<li>
+				<strong>Statut :</strong>
+				{{ order.paymentStatus }}</li>
+		</ul>
+
+		<!-- Détails des produits -->
+		<h3>Détails des produits</h3>
+		<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+			<thead>
+				<tr>
+					<th style="border-bottom: 1px solid #ddd; padding: 8px; text-align: left;">Produit</th>
+					<th style="border-bottom: 1px solid #ddd; padding: 8px; text-align: center;">Quantité</th>
+					<th style="border-bottom: 1px solid #ddd; padding: 8px; text-align: right;">Prix Unitaire</th>
+					<th style="border-bottom: 1px solid #ddd; padding: 8px; text-align: right;">Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for detail in orderDetails %}
+					<tr>
+						<td style="padding: 8px; border-bottom: 1px solid #eee;">{{ detail.product.label }}</td>
+						<td style="padding: 8px; text-align: center; border-bottom: 1px solid #eee;">{{ detail.quantity }}</td>
+						<td style="padding: 8px; text-align: right; border-bottom: 1px solid #eee;">{{ detail.price|number_format(2, ',', ' ') }}
+							€</td>
+						<td style="padding: 8px; text-align: right; border-bottom: 1px solid #eee;">
+							{{ (detail.price * detail.quantity)|number_format(2, ',', ' ') }}
+							€
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+		<!-- Montant total -->
+		<h3 style="margin-top: 20px;">Montant Total :
+			<span style="color: #006400;">{{ order.total|number_format(2, ',', ' ') }}
+				€</span>
+		</h3>
+
+		<p>Nous vous remercions pour votre confiance et restons à votre disposition pour toute question.</p>
+
+
+		<p style="margin-top: 20px; font-size: 0.9em; color: #555;">
+			Cet email est généré automatiquement, merci de ne pas y répondre.
+		</p>
+	</body>
+</html>
