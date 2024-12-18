@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Nouvelle demande de contact</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				color: #333;
+			}
+			.container {
+				width: 90%;
+				max-width: 600px;
+				margin: 0 auto;
+				padding: 20px;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				background-color: #f9f9f9;
+			}
+			.header {
+				text-align: center;
+				margin-bottom: 20px;
+			}
+			.header h1 {
+				margin: 0;
+				color: #5a5a5a;
+			}
+			.content {
+				margin: 20px 0;
+			}
+			.footer {
+				text-align: center;
+				margin-top: 20px;
+				font-size: 0.9em;
+				color: #aaa;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<h1>Nouvelle demande de contact</h1>
+				<p>Un client a envoyé un message via le formulaire de contact.</p>
+			</div>
+			<div class="content">
+				<p>Voici les détails :</p>
+				<ul>
+					<li>
+						<strong>Nom et Prénom :</strong>
+						{{ form.firstName }}
+						-
+						{{ form.lastName }}</li>
+					<li>
+						<strong>Email :</strong>
+						{{ form.email }}</li>
+					<li>
+						<strong>Sujet :</strong>
+						{{ form.subject }}</li>
+					<li>
+						<strong>Message :</strong>
+						{{ form.message }}</li>
+				</ul>
+			</div>
+			<div class="footer">
+				<p>Connectez-vous à l'interface d'administration pour traiter cette demande.</p>
+				<p>
+					<strong>Village Green</strong>
+				</p>
+			</div>
+		</div>
+	</body>
+</html>

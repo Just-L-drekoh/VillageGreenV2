@@ -13,6 +13,10 @@ class DashboardController extends AbstractDashboardController
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
+        $user = $this->getUser();
+        if (!$user && !$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         return parent::index();
 
         // Option 1. You can make your dashboard redirect to some common page of your backend

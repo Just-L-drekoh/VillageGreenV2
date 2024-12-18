@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Confirmation de contact</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				color: #333;
+			}
+			.container {
+				width: 90%;
+				max-width: 600px;
+				margin: 0 auto;
+				padding: 20px;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				background-color: #f9f9f9;
+			}
+			.header {
+				text-align: center;
+				margin-bottom: 20px;
+			}
+			.header h1 {
+				margin: 0;
+				color: #5a5a5a;
+			}
+			.content {
+				margin: 20px 0;
+			}
+			.footer {
+				text-align: center;
+				margin-top: 20px;
+				font-size: 0.9em;
+				color: #aaa;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<h1>Merci pour votre demande</h1>
+				<p>Nous avons bien reçu votre message.</p>
+			</div>
+			<div class="content">
+				<p>Bonjour
+					{{ form.firstName }}
+					-
+					{{ form.lastName }},</p>
+				<p>Votre demande de contact a bien été prise en compte. Voici un récapitulatif :</p>
+				<ul>
+					<li>
+						<strong>Email :</strong>
+						{{ form.email }}</li>
+					<li>
+						<strong>Sujet :</strong>
+						{{ form.subject }}</li>
+					<li>
+						<strong>Message :</strong>
+						{{ form.message }}</li>
+				</ul>
+				<p>Nous vous répondrons dans les plus brefs délais.</p>
+			</div>
+			<div class="footer">
+				<p>Merci de nous avoir contactés.</p>
+				<p>
+					<strong>Village Green</strong>
+					-
+					<a href="http://localhost">www.village-green.fr</a>
+				</p>
+			</div>
+		</div>
+	</body>
+</html>

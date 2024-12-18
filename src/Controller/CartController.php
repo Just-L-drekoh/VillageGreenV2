@@ -8,7 +8,6 @@ use App\Entity\OrderDetails;
 use App\Repository\ProductRepository;
 use App\Service\SendEmailService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -211,8 +210,24 @@ class CartController extends AbstractController
 
 
     #[Route('/ChoiceMultipleDeliveryByCart', name: 'Choice_Multiple_Delivery_By_Cart')]
-    public function ChoiceMultipleDeliveryByCart(SessionInterface $session, ProductRepository $productRepository, Request $request): Response
+    public function ChoiceMultipleDeliveryByCart(SessionInterface $session): Response
     {
+        try {
+            $panier = $session->get('panier', []);
+            if (empty($panier)) {
+                $this->addFlash('warning', 'Votre panier est vide.');
+                return $this->redirectToRoute('cart_index');
+            }
+            if (!$this->getUser()) {
+                $this->addFlash('warning', 'Vous devez vous connecter pour passer une commande.');
+                return $this->redirectToRoute('app_login');
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue.');
+            return $this->redirectToRoute('cart_index');
+        }
+
+
         return $this->render('delivery/Choice_multiple_delivery.html.twig', []);
     }
 
