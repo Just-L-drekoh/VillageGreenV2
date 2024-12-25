@@ -44,74 +44,59 @@ class AddressController extends AbstractController
     #[Route('/add', name: 'add')]
     public function addAddress(Request $request, EntityManagerInterface $entityManager): Response
     {
-        try {
-            if ($response = $this->checkUser()) {
-                return $response;
-            }
+        if ($response = $this->checkUser()) {
+            return $response;
+        }
 
-            $user = $this->getUser();
-            $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
-            $availableTypes = $this->getAvailableTypes($existingAddresses);
+        $user = $this->getUser();
+        $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
+        $availableTypes = $this->getAvailableTypes($existingAddresses);
 
-            if (empty($availableTypes)) {
-                $this->addFlash('warning', 'Vous avez déjà une adresse de livraison et une adresse de facturation. (Modifiez ou supprimez une adresse pour en ajouter une nouvelle.)');
-                return $this->redirectToRoute('profile_index');
-            }
-
-            $address = (new Address())->setUser($user)->setDefault(true);
-
-            $form = $this->createForm(AddressFormType::class, $address, [
-                'available_types' => $availableTypes,
-            ]);
-            $form->handleRequest($request);
-
-            if ($form->isSubmitted() && $form->isValid()) {
-                $entityManager->persist($address);
-                $entityManager->flush();
-
-                $this->addFlash('success', 'Adresse ajoutée avec succès.');
-                return $this->redirectToRoute('profile_index');
-            }
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur est survenue lors de l\'ajout de l\'adresse.');
+        if (empty($availableTypes)) {
+            $this->addFlash('warning', 'Vous avez déjà une adresse de livraison et une adresse de facturation.');
             return $this->redirectToRoute('profile_index');
         }
+
+        $address = (new Address())->setUser($user)->setDefault(true);
+        $form = $this->createForm(AddressFormType::class, $address, ['available_types' => $availableTypes]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($address);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Adresse ajoutée avec succès.');
+            return $this->redirectToRoute('profile_index');
+        }
+
         return $this->render('address/add_address.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
+
     #[Route('/update/{id}', name: 'update')]
     public function updateAddress(Request $request, Address $address, EntityManagerInterface $entityManager): Response
     {
-        try {
-            if ($response = $this->checkUser()) {
-                return $response;
-            }
+        if ($response = $this->checkUser()) {
+            return $response;
+        }
 
-            $user = $this->getUser();
-            if ($address->getUser() !== $user) {
-                $this->addFlash('error', 'Vous n\'avez pas la permission de modifier cette adresse.');
-                return $this->redirectToRoute('profile_index');
-            }
+        if ($address->getUser() !== $this->getUser()) {
+            $this->addFlash('error', 'Vous n\'avez pas la permission de modifier cette adresse.');
+            return $this->redirectToRoute('profile_index');
+        }
 
-            $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $user]);
-            $availableTypes = $this->getAvailableTypes($existingAddresses, $address->getType());
+        $existingAddresses = $entityManager->getRepository(Address::class)->findBy(['user' => $this->getUser()]);
+        $availableTypes = $this->getAvailableTypes($existingAddresses, $address->getType());
 
-            $form = $this->createForm(AddressFormType::class, $address, [
-                'available_types' => $availableTypes,
-            ]);
-            $form->handleRequest($request);
+        $form = $this->createForm(AddressFormType::class, $address, ['available_types' => $availableTypes]);
+        $form->handleRequest($request);
 
-            if ($form->isSubmitted() && $form->isValid()) {
-                $entityManager->persist($address);
-                $entityManager->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
 
-                $this->addFlash('success', 'Adresse mise à jour avec succès.');
-                return $this->redirectToRoute('profile_index');
-            }
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'adresse.');
+            $this->addFlash('success', 'Adresse mise à jour avec succès.');
             return $this->redirectToRoute('profile_index');
         }
 
@@ -120,28 +105,23 @@ class AddressController extends AbstractController
         ]);
     }
 
+
     #[Route('/delete/{id}', name: 'delete')]
     public function deleteAddress(Address $address, EntityManagerInterface $entityManager): Response
     {
-        try {
-            if ($response = $this->checkUser()) {
-                return $response;
-            }
+        if ($response = $this->checkUser()) {
+            return $response;
+        }
 
-            $user = $this->getUser();
-            if ($address->getUser() !== $user) {
-                $this->addFlash('error', 'Vous n\'avez pas la permission de supprimer cette adresse.');
-                return $this->redirectToRoute('profile_index');
-            }
-
-            $entityManager->remove($address);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Adresse supprimée avec succès.');
-            return $this->redirectToRoute('profile_index');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur est survenue lors de la suppression de l\'adresse.');
+        if ($address->getUser() !== $this->getUser()) {
+            $this->addFlash('error', 'Vous n\'avez pas la permission de supprimer cette adresse.');
             return $this->redirectToRoute('profile_index');
         }
+
+        $entityManager->remove($address);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Adresse supprimée avec succès.');
+        return $this->redirectToRoute('profile_index');
     }
 }

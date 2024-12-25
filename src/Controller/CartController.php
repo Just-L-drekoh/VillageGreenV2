@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\OrderDetails;
-use App\Repository\ProductRepository;
+use App\Service\OrderService;
 use App\Service\SendEmailService;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,6 +16,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/cart', name: 'cart_')]
 class CartController extends AbstractController
 {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private OrderService $orderService,
+        private SendEmailService $sendEmailService
+    ) {}
+
     private function calculateProductDetails(Product $product, int $quantity): array
     {
         $taxRate = $product->getTax()?->getRate() ?? 0;
@@ -55,6 +61,8 @@ class CartController extends AbstractController
                         'product' => $product,
                         'quantity' => $quantity,
                         'priceWithTax' => $productDetails['priceWithTax'],
+                        'total' => $productDetails['total'],
+                        'totalTaxes' => $productDetails['totalTaxes'],
                     ];
                 }
             }
@@ -64,6 +72,7 @@ class CartController extends AbstractController
             $this->addFlash('error', 'Une erreur est survenue.');
             return $this->redirectToRoute('cart_index');
         }
+
         return $this->render('cart/index.html.twig', [
             'products' => $dataProduct,
             'total' => $total,
@@ -92,16 +101,6 @@ class CartController extends AbstractController
         }
     }
 
-    #[Route('/allRemove/{id}', name: 'allRemove')]
-    public function allRemove(Product $product, SessionInterface $session): Response
-    {
-        $panier = $session->get('panier', []);
-        unset($panier[$product->getId()]);
-        $session->set('panier', $panier);
-
-        return $this->redirectToRoute('cart_index');
-    }
-
     #[Route('/remove/{id}', name: 'remove')]
     public function remove(Product $product, SessionInterface $session): Response
     {
@@ -125,8 +124,29 @@ class CartController extends AbstractController
         }
     }
 
+    #[Route('/allRemove/{id}', name: 'allRemove')]
+    public function allRemove(Product $product, SessionInterface $session): Response
+    {
+        try {
+            $panier = $session->get('panier', []);
+            $id = $product->getId();
+
+            if (!empty($panier[$id])) {
+                unset($panier[$id]);
+            }
+
+            $session->set('panier', $panier);
+
+            return $this->redirectToRoute('cart_index');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue.');
+            return $this->redirectToRoute('cart_index');
+        }
+    }
+
+
     #[Route('/order', name: 'order')]
-    public function order(SessionInterface $session, EntityManagerInterface $entityManager, SendEmailService $mail): Response
+    public function order(SessionInterface $session): Response
     {
         try {
             if (!$this->getUser()) {
@@ -143,96 +163,31 @@ class CartController extends AbstractController
             $paiement = $session->get('paiement');
             if (empty($paiement)) {
                 $this->addFlash('warning', 'Aucun moyen de paiement sélectionné.');
-                return $this->redirectToRoute('cart_index');
+                return $this->redirectToRoute('validation_cart_paiement');
             }
 
-            $order = (new Order())
-                ->setUser($this->getUser())
-                ->setRef('Com:' . uniqid() . mt_rand(100, 999))
-                ->setPaymentMethod($paiement)
-                ->setType('commande')
-                ->setPaymentDate(new \DateTimeImmutable())
-                ->setPaymentStatus('En Cours de traitement')
-                ->setDate(new \DateTimeImmutable())
-                ->setStatus('En Attente');
+            $order = $this->orderService->createOrder($this->getUser(), $panier, $paiement);
+            $orderDetails = $this->entityManager->getRepository(OrderDetails::class)->findBy(['order' => $order]);
 
-            $totalAmount = 0;
-            $orderDetails = [];
-
-            foreach ($panier as $id => $quantity) {
-                $product = $entityManager->getRepository(Product::class)->find($id);
-                if ($product) {
-                    $productDetails = $this->calculateProductDetails($product, $quantity);
-                    $totalAmount += $productDetails['total'];
-
-                    $orderDetail = (new OrderDetails())
-                        ->setOrder($order)
-                        ->setProduct($product)
-                        ->setQuantity($quantity)
-                        ->setPrice($productDetails['priceWithTax']);
-
-                    $orderDetails[] = $orderDetail;
-                    $entityManager->persist($orderDetail);
-                } else {
-                    $this->addFlash('warning', "Le produit avec l'ID ($id) n'existe pas et a été ignoré.");
-                }
-            }
-
-            if (empty($orderDetails)) {
-                $this->addFlash('warning', 'Aucun produit valide dans votre panier.');
-                return $this->redirectToRoute('cart_index');
-            }
-
-            $order->setTotal($totalAmount);
-            $entityManager->persist($order);
-            $entityManager->flush();
-
-            $mail->send(
+            $this->sendEmailService->send(
                 'no-reply@village-green.fr',
                 $session->get('user')->getEmail(),
                 'Votre commande sur le site Village Green',
                 'recap',
                 [
                     'order' => $order,
-                    'orderDetails' => $orderDetails,
+                    'orderDetails' => $orderDetails
                 ]
             );
 
             $session->clear();
             $this->addFlash('success', 'Votre commande a été enregistrée avec succès.');
-
             return $this->redirectToRoute('profile_index');
         } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur est survenue.');
+            $this->addFlash('error', $e->getMessage());
             return $this->redirectToRoute('cart_index');
         }
     }
-
-
-    #[Route('/ChoiceMultipleDeliveryByCart', name: 'Choice_Multiple_Delivery_By_Cart')]
-    public function ChoiceMultipleDeliveryByCart(SessionInterface $session): Response
-    {
-        try {
-            $panier = $session->get('panier', []);
-            if (empty($panier)) {
-                $this->addFlash('warning', 'Votre panier est vide.');
-                return $this->redirectToRoute('cart_index');
-            }
-            if (!$this->getUser()) {
-                $this->addFlash('warning', 'Vous devez vous connecter pour passer une commande.');
-                return $this->redirectToRoute('app_login');
-            }
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur est survenue.');
-            return $this->redirectToRoute('cart_index');
-        }
-
-
-        return $this->render('delivery/Choice_multiple_delivery.html.twig', []);
-    }
-
-
-
 
     #[Route('/recap', name: 'recap')]
     public function recap(ProductRepository $productRepository, SessionInterface $session): Response
@@ -245,24 +200,39 @@ class CartController extends AbstractController
 
             $panier = $session->get('panier', []);
             $address = $session->get('address');
+            $dataProduct = [];
+            $total = 0;
+            $totalTaxes = 0;
 
-            $dataProduct = array_filter(array_map(function ($id) use ($productRepository, $panier) {
+            foreach ($panier as $id => $quantity) {
                 $product = $productRepository->find($id);
-                return $product ? [
-                    'product' => $product,
-                    'quantity' => $panier[$id],
-                    'label' => $product->getLabel(),
-                ] : null;
-            }, array_keys($panier)));
+                if ($product) {
+                    $productDetails = $this->calculateProductDetails($product, $quantity);
+                    $total += $productDetails['total'];
+                    $totalTaxes += $productDetails['totalTaxes'];
+
+                    $dataProduct[] = [
+                        'product' => $product,
+                        'quantity' => $quantity,
+                        'priceWithTax' => $productDetails['priceWithTax'],
+                        'total' => $productDetails['total'],
+                        'totalTaxes' => $productDetails['totalTaxes'],
+                    ];
+                }
+            }
         } catch (\Exception $e) {
             $this->addFlash('error', 'Une erreur est survenue.');
             return $this->redirectToRoute('cart_index');
         }
+
         return $this->render('cart/recap.html.twig', [
             'recap' => [
                 'products' => $dataProduct,
                 'addresses' => $address,
+                'total' => $total,
+                'totalTaxes' => $totalTaxes,
             ],
+
         ]);
     }
 }

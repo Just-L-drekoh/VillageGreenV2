@@ -13,7 +13,7 @@
 		</h1>
 
 		<div class="flex justify-center items-center">
-			<div class="bg-white shadow-md rounded-lg p-10 w-full max-w-lg">
+			<div class="bg-white shadow-md rounded-lg p-10 w-full max-w-2xl">
 				<h2 class="text-3xl font-semibold text-gray-800 mb-6 text-center">Récapitulatif</h2>
 
 				<div
@@ -36,36 +36,39 @@
 									</h4>
 									<p class="text-gray-600">
 										<strong>Adresse :</strong>
-										{{ address.address }}</p>
+										{{ address.address }}
+									</p>
 									<p class="text-gray-600">
 										<strong>Ville :</strong>
-										{{ address.city }}</p>
+										{{ address.city }}
+									</p>
 									<p class="text-gray-600">
 										<strong>Code Postal :</strong>
-										{{ address.cp }}</p>
+										{{ address.cp }}
+									</p>
 								</li>
 							{% endfor %}
 						</ul>
 					</div>
 
-					<h3>Produits dans votre panier</h3>
-					<table class="table">
+					<h3 class="text-xl font-semibold text-gray-700 mt-6">Produits dans votre panier</h3>
+					<table class="w-full table-auto border-separate border-spacing-4 mt-4">
 						<thead>
-							<tr>
-								<th>Produit</th>
-								<th>Quantité</th>
-								<th>Prix</th>
-								<th>Total</th>
+							<tr class="text-left">
+								<th class="text-sm font-medium text-gray-600">Produit</th>
+								<th class="text-sm font-medium text-gray-600">Quantité</th>
+								<th class="text-sm font-medium text-gray-600">Prix</th>
+								<th class="text-sm font-medium text-gray-600">Total</th>
 							</tr>
 						</thead>
 						<tbody>
 							{% for item in recap.products %}
 								<tr>
-									<td>{{ item.product.label }}</td>
-									<td>{{ item.quantity }}</td>
-									<td>{{ item.product.price|number_format(2, ',', ' ') }}
+									<td class="text-gray-700">{{ item.product.label }}</td>
+									<td class="text-gray-700">{{ item.quantity }}</td>
+									<td class="text-gray-700">{{ item.priceWithTax|number_format(2, ',', ' ') }}
 										€</td>
-									<td>{{ (item.product.price * item.quantity)|number_format(2, ',', ' ') }}
+									<td class="text-gray-700">{{ item.total|number_format(2, ',', ' ') }}
 										€</td>
 								</tr>
 							{% endfor %}
@@ -73,21 +76,19 @@
 					</table>
 
 					{% if recap.products is not empty %}
-						<div class="d-flex justify-content-end">
-							<h4>Total :
-								{% set total = 0 %}
-								{% for item in recap.products %}
-									{{ app.session.get('ttc')}}
-								{% endfor %}
-
-								€
+						<div class="flex justify-end mt-4">
+							<h4 class="text-xl font-semibold text-gray-800">Total :
+								<span class="text-green-600">{{ app.session.get('ttc')|number_format(2, ',', ' ') }}
+									€</span>
 							</h4>
 						</div>
 					{% endif %}
 
-					<div class="mt-4">
-						<a href="{{ path('cart_order') }}" class="btn btn-primary">Passer à la caisse</a>
+					<div class="mt-6 flex justify-center">
+						<a href="{{ path('cart_order') }}" class="bg-blue-500 text-white px-6 py-3 rounded-md shadow-md hover:bg-blue-600 transition duration-200">Passer à la caisse</a>
 					</div>
 				</div>
-			</main>
-		{% endblock %}
+			</div>
+		</div>
+	</main>
+{% endblock %}

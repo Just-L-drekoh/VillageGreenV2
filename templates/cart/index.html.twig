@@ -2,76 +2,65 @@
 
 {% block title %}
 	Panier de
-	{{ app.user.firstName }}
+	{{ app.user.firstName | e }}
 {% endblock %}
 
 {% block body %}
-	<main
-		class="container mx-auto px-4 py-12 bg-white shadow-lg rounded-xl max-w-7xl">
-
-		<!-- Header de la page -->
-		<header class="text-center mb-8">
-			<h1 class="text-4xl font-bold text-gray-800">
-				Votre Panier
-			</h1>
+	<main class="container mx-auto px-6 py-12 bg-gray-100 min-h-screen">
+		<header class="text-center mb-10">
+			<h1 class="text-4xl font-bold text-gray-900">Votre Panier</h1>
 		</header>
 
 		{% if products|length == 0 %}
-			<!-- Section Panier Vide -->
-			<section class="text-center">
-				<p class="text-lg text-gray-600 mb-4">Votre panier est vide.</p>
-				<a href="{{ path('product_index') }}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition transform hover:scale-105">
+			<section class="flex flex-col items-center">
+				<p class="text-lg text-gray-600 mb-6">Votre panier est vide.</p>
+				<a href="{{ path('product_index') }}" class="bg-blue-600 text-white px-8 py-3 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition transform hover:scale-105">
 					Découvrez nos produits
 				</a>
 			</section>
 		{% else %}
-			<!-- Section Liste des Produits -->
-			<section class="space-y-8">
+			<section class="space-y-6">
 				{% for product in products %}
-					<article class="flex items-center justify-between bg-gray-50 p-6 rounded-lg shadow-md">
-						<div
-							class="flex items-center space-x-6">
-							<!-- Image produit -->
+					<article class="bg-white rounded-lg shadow-lg p-6 flex flex-col md:flex-row items-center justify-between">
+						<div class="flex items-center space-x-6 mb-4 md:mb-0">
 							{% if product.product.image|length > 0 %}
-								<img src="{{ product.product.image[0].img }}" alt="{{ product.product.label }}" class="w-32 h-32 object-cover rounded-lg"/>
+								<img src="{{ product.product.image[0].img | e }}" alt="{{ product.product.label | e }}" class="w-24 h-24 object-cover rounded-lg border border-gray-300"/>
 							{% else %}
-								<div class="w-32 h-32 bg-gray-300 rounded-lg"></div>
+								<div class="w-24 h-24 bg-gray-300 rounded-lg flex items-center justify-center">
+									<span class="text-gray-500 text-sm">Pas d'image</span>
+								</div>
 							{% endif %}
+
 							<div>
-								<h2 class="text-xl font-semibold text-gray-800">{{ product.product.label }}</h2>
-								<p class="text-lg text-gray-600 mt-2">Prix :
-									<span class="font-bold">{{ product.product.price }}
-										€</span>
+								<h2 class="text-xl font-semibold text-gray-800">{{ product.product.label | e }}</h2>
+								<p class="text-gray-600 mt-2">Prix :
+									<span class="font-bold">{{ product.product.price | number_format(2, '.', ',') }}€</span>
 								</p>
 							</div>
 						</div>
 
-						<!-- Section Contrôles de quantité -->
 						<div class="flex items-center space-x-4">
-							<a href="{{ path('cart_remove', { id: product.product.id }) }}" class="text-2xl text-red-600 hover:text-red-800 transition transform hover:scale-110">
+							<a href="{{ path('cart_remove', { id: product.product.id }) }}" class="bg-red-600 text-white px-3 py-1 rounded-full shadow-md hover:bg-red-700 hover:shadow-lg transition">
 								-
 							</a>
-							<span class="text-lg font-bold text-gray-800">{{ product.quantity }}</span>
-							<a href="{{ path('cart_add', { id: product.product.id }) }}" class="text-2xl text-green-600 hover:text-green-800 transition transform hover:scale-110">
+							<span class="text-lg font-semibold">{{ product.quantity }}</span>
+							<a href="{{ path('cart_add', { id: product.product.id }) }}" class="bg-green-600 text-white px-3 py-1 rounded-full shadow-md hover:bg-green-700 hover:shadow-lg transition">
 								+
 							</a>
 						</div>
 
-						<!-- Lien Supprimer le produit -->
-						<a href="{{ path('cart_allRemove', { id: product.product.id }) }}" class="text-sm text-red-600 hover:text-red-800 transition transform hover:scale-110">
+						<a href="{{ path('cart_allRemove', { id: product.product.id }) }}" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 hover:shadow-lg transition">
 							Supprimer
 						</a>
 					</article>
 				{% endfor %}
 			</section>
 
-			<!-- Section Total et validation -->
-			<section class="mt-8 text-center">
-				<p class="text-2xl font-semibold text-gray-800 mb-6">Total :
-					<span class="text-blue-600">{{ total }}
-						€</span>
+			<section class="mt-10 text-center">
+				<p class="text-2xl font-bold text-gray-900">Total :
+					<span class="text-blue-600">{{ total | number_format(2, '.', ',') }}€</span>
 				</p>
-				<a href="{{ path('validation_cart_address') }}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition transform hover:scale-105">
+				<a href="{{ path('validation_cart_address') }}" class="inline-block mt-6 bg-blue-600 text-white px-8 py-3 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition transform hover:scale-105">
 					Choisir une adresse
 				</a>
 			</section>

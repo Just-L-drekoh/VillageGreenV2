@@ -3,6 +3,20 @@
 {% endblock %}
 {% block body %}
 
+	{% if not app.user.verified %}
+		<div class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg container mx-auto">
+			<p class="font-medium text-center">
+				Votre compte n'est pas encore activé. Cliquez sur le bouton ci-dessous  pour recevoir un nouvel e-mail d'activation.
+			</p>
+		</div>
+
+		<div class="mt-6 text-center">
+			<a href="{{ path('app_resend_email') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+				Renvoyer l'e-mail de vérification
+			</a>
+		</div>
+	{% endif %}
+
 	<div class="container mx-auto mt-12 p-8 bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 shadow-2xl rounded-xl">
 		<h1 class="text-5xl font-extrabold text-gray-900 text-center mb-6">
 			Bienvenue,
@@ -73,20 +87,6 @@
 		</div>
 	</div>
 
-	{% if not app.user.verified %}
-		<div class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg">
-			<p class="font-medium text-center">
-				Votre compte n'est pas encore activé. Cliquez sur le bouton ci-dessous
-																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																							      pour recevoir un nouvel e-mail d'activation.
-			</p>
-		</div>
-
-		<div class="mt-6 text-center">
-			<a href="{{ path('app_resend_email') }}" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
-				Renvoyer l'e-mail de vérification
-			</a>
-		</div>
-	{% endif %}
 	<div class="container mx-auto mt-12 p-8 bg-gradient-to-r from-green-100 via-yellow-100 to-green-300 shadow-xl rounded-xl">
 		<h2 class="text-4xl font-bold text-gray-800 text-center mb-6">Vos Adresses</h2>
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -104,10 +104,10 @@
 							{{ address.cp }}</p>
 						<p class="text-sm text-gray-500">{{ address.complement }}</p>
 						<div class="mt-4">
-							<a href="{{ path('address_update', {'id': address.id}) }}" class="text-blue-600 hover:underline mr-4">
+							<a href="{{ path('address_update', { 'id': address.id }) }}" class="bg-blue-600 mr-4 text-white px-3 py-1 rounded-full shadow-md hover:bg-red-700 hover:shadow-lg transition">
 								Modifier
 							</a>
-							<a href="{{ path('address_delete', {'id': address.id}) }}" class="text-red-600 hover:underline">
+							<a href="{{ path('address_delete', { 'id': address.id }) }}" class="bg-red-600 mr-4  text-white px-3 py-1 rounded-full shadow-md hover:bg-red-700 hover:shadow-lg transition">
 								Supprimer
 							</a>
 						</div>
