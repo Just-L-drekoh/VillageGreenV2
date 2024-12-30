@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Delivery;
 use App\Entity\Product;
 use App\Entity\OrderDetails;
 use App\Service\OrderService;
@@ -166,7 +167,7 @@ class CartController extends AbstractController
                 return $this->redirectToRoute('validation_cart_paiement');
             }
 
-            $order = $this->orderService->createOrder($this->getUser(), $panier, $paiement);
+            $order = $this->orderService->createOrderWithDelivery($this->getUser(), $panier, $paiement);
             $orderDetails = $this->entityManager->getRepository(OrderDetails::class)->findBy(['order' => $order]);
 
             $this->sendEmailService->send(
@@ -181,7 +182,7 @@ class CartController extends AbstractController
             );
 
             $session->clear();
-            $this->addFlash('success', 'Votre commande a été enregistrée avec succès.');
+            $this->addFlash('success', 'Votre commande a été enregistrée avec succès.(Vous allez recevoir un mail de confirmation)');
             return $this->redirectToRoute('profile_index');
         } catch (\Exception $e) {
             $this->addFlash('error', $e->getMessage());

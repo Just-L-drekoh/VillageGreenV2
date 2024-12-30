@@ -62,7 +62,7 @@ class ProfilController extends AbstractController
                     $entityManager->flush();
 
                     $this->addFlash('success', 'Votre profil a été mis à jour avec succès.');
-                    return $this->redirectToRoute('villageGreen_index');
+                    return $this->redirectToRoute('profile_index');
                 } catch (\Exception $exception) {
                     $this->addFlash('error', 'Une erreur s\'est produite lors de la mise à jour de votre profil.');
                 }

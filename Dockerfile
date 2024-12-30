@@ -2,10 +2,22 @@ FROM php:8.3-apache
 
 RUN a2enmod rewrite
 
-RUN apt-get update
-RUN apt install -y libzip-dev git wget --no-install-recommends
- 
-RUN docker-php-ext-install pdo mysqli pdo_mysql zip;
+RUN apt-get update && \
+    apt-get install -y \
+    libzip-dev \
+    libicu-dev \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    git \
+    wget \
+    curl \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+# Installer les extensions PHP nécessaires
+RUN docker-php-ext-install pdo pdo_mysql mysqli zip intl opcache
+
 
 
 
