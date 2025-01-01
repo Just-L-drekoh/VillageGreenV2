@@ -22,7 +22,7 @@ class OrderService
     {
         $order = (new Order())
             ->setUser($user)
-            ->setRef(uniqid('ORD-', true))
+            ->setRef(uniqid(true))
             ->setPaymentMethod($paymentMethod)
             ->setType('commande')
             ->setPaymentDate(new \DateTimeImmutable())
